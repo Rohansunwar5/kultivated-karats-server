@@ -1,4 +1,5 @@
 import { Order } from "../models/orders.model.js";
+import { User } from "../models/users.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -23,17 +24,18 @@ const createAnOrder = asyncHandler( async (req, res) => {
     try {
         const { order } = req.body;
     
-        if ( !(req?.user?.role === "Admin") )
-            throw new ApiError(400, "Unauthorized requrest!");
+        // if ( !(req?.user?.role === "Admin") )
+        //     throw new ApiError(400, "Unauthorized requrest!");
     
         if ( !order )
             throw new ApiError(400, "No order object recieved!");
     
         const newOrder = await Order.create(order);
-    
         if ( !newOrder )
             throw new ApiError(500, "Error while creating order!");
-    
+        
+        // const user = await User.findByIdAndUpdate({ _id: req?.user?._id }, { orders: [ ...req?.user?.orders, new mongoose.Types.ObjectId(newOrder?._id) ] })
+        // console.log(user);
         return res.status(200).json(new ApiResponse(200, newOrder, "order created successfully!"));    
     } catch (error) {
         let errorMessage;

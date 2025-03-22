@@ -67,10 +67,10 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    totalKarats: {
+    totalKarats: [{
         type: Number,
         required: true
-    },
+    }],
     gender: {
         type: String,
         required: true,

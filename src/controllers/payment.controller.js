@@ -3,7 +3,11 @@ import { GiftCard } from "../models/giftCards.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { createHmac } from 'crypto';
 // import { app } from "../../../../backend/src/app.js";
+
+console.log(process.env.RAZORPAY_KEY_ID, process.env.RAZORPAY_KEY_SECRET);
+
 
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -20,11 +24,14 @@ const verifyGiftCard = asyncHandler( async () => {
     }
 });
 
-const validatePayment = asyncHandler( async () => {
+const validatePayment = asyncHandler( async (req, res) => {
     try {
         const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
     
-        const sha = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
+        if ( !razorpay_order_id | !razorpay_payment_id | !razorpay_signature)
+            throw new ApiError(400, "Requestes parameters not present!");
+
+        const sha = createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
         sha.update(`${razorpay_order_id}|${razorpay_payment_id}`);
         const digest = sha.digest("hex");
         if ( digest !== razorpay_signature ) 
