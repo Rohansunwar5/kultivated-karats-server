@@ -4,6 +4,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { createHmac } from 'crypto';
+import { Order } from "../models/orders.model.js";
 // import { app } from "../../../../backend/src/app.js";
 
 console.log(process.env.RAZORPAY_KEY_ID, process.env.RAZORPAY_KEY_SECRET);
@@ -36,6 +37,9 @@ const validatePayment = asyncHandler( async (req, res) => {
         const digest = sha.digest("hex");
         if ( digest !== razorpay_signature ) 
             throw new ApiError(400, { isValid: false }, "Transaction not legit!");
+
+        const order = await Order.create();
+
         return res.status(200).json(new ApiResponse(200, { isValid: true }, "Transaction valid"));
     } catch (error) {
         console.log(error);        

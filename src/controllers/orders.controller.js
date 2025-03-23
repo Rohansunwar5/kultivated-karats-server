@@ -33,7 +33,7 @@ const createAnOrder = asyncHandler( async (req, res) => {
         const newOrder = await Order.create(order);
         if ( !newOrder )
             throw new ApiError(500, "Error while creating order!");
-        
+            
         // const user = await User.findByIdAndUpdate({ _id: req?.user?._id }, { orders: [ ...req?.user?.orders, new mongoose.Types.ObjectId(newOrder?._id) ] })
         // console.log(user);
         return res.status(200).json(new ApiResponse(200, newOrder, "order created successfully!"));    

@@ -1,5 +1,4 @@
 import mongoose, { Schema } from "mongoose";
-import { Category } from "./categories.model.js";
 
 const productSchema = new mongoose.Schema({
     productId: {
@@ -7,10 +6,6 @@ const productSchema = new mongoose.Schema({
         required: true,
         unique: true,
         index: true,
-    },
-    code: {
-        type: String,
-        required: true
     },
     name: {
         type: String,
@@ -57,11 +52,11 @@ const productSchema = new mongoose.Schema({
     },
     noOfSolitares: {
         type: Number,
-        required: true
+        // required: true
     },
     noOfMultiDiamonds: {
         type: Number,
-        required: true
+        // required: true
     },
     multiDiamondWeight: {
         type: Number,
@@ -74,12 +69,13 @@ const productSchema = new mongoose.Schema({
     gender: {
         type: String,
         required: true,
-        enum: [ "male", "female", "neutral" ]
+        enum: [ "Male", "Female", "Unisex" ]
     },
     goldColor: [
         {
             type: String,
             required: true,
+            enum: [ "Rose", "Yellow", "White" ]
         }
     ],
     shapeOfSolitare: {

@@ -22,7 +22,13 @@ import paymentRouter from "./routes/payment.routes.js";
 const app = express();
 
 app.use(cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: function (origin, callback) {
+        if (!origin || process.env.CORS_ORIGIN.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+    },
     methods: [ "GET", "POST", "PUT", "PATCH", "DELETE" ],
     credentials: true,
 }));

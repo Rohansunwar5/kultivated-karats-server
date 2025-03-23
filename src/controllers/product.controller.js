@@ -224,8 +224,9 @@ const setBasePrice =  asyncHandler( async (req, res) => {
 
         allProducts.forEach(element => {
             const diamondPrice = getDiamondPrice({ netWeight:element?.netWeight, diamondWeight: element?.diamondWeight, solitareWeight: element?.solitareWeight, multiDiaWeight: element?.multiDiamondWeight });
-            // const updatedProduct = Product.findOneAndUpdate({ _id: element?._id },{ $set: { price: diamondPrice}}, { new: true});
+            const updatedProduct = Product.findOneAndUpdate({ _id: element?._id },{ $set: { price: diamondPrice}}, { new: true});
             console.log(element?.netWeight, element?.diamondWeight, element?.solitareWeight, element?.multiDiamondWeight);
+            console.log(updatedProduct);
         });
 
         // const allProducts = await Product.find();
