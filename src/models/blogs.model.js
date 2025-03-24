@@ -29,6 +29,10 @@ const blogSchema = new mongoose.Schema({
             required: true,
         }
     },
+    blogDescription: {
+        type: String,
+        // required: true,
+    }
 }, { timestamps: true });
 
 export const Blog = mongoose.model("Blog", blogSchema);

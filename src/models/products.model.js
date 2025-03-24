@@ -114,7 +114,10 @@ const productSchema = new mongoose.Schema({
                 required: true
             }
         }
-    ]
+    ],
+    isPendantFixed: {
+        type: Boolean,
+    },    
 }, { timestamps: true });
 
 export const Product = mongoose.model("Product", productSchema);
