@@ -12,7 +12,7 @@ export const verifyJWT = asyncHandler( async (req, _ , next) => { /* "_" is "res
     
         const decodedTokenData = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     
-        const user = await User.findById(decodedTokenData?._id).populate("wishList.product").populate("videoCallCart.product").populate("cart.product").populate("orders.product").select("-password -refreshToken");
+        const user = await User.findById(decodedTokenData?._id).populate("wishList.product").populate("videoCallCart.product").populate("cart.product").populate("orders").populate("orders.product").select("-password -refreshToken");
         if ( !user ) 
             new ApiError(401, "Invalid Access Token!", [{type: "email", errMsg: "Invalid access token!"}]);
     

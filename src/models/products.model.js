@@ -118,6 +118,31 @@ const productSchema = new mongoose.Schema({
     isPendantFixed: {
         type: Boolean,
     },    
+    containsGemstone: {
+        type: Boolean,
+        required: true
+    },
+    gemStoneWeight: {
+        type: Number
+    },
+    isMrpProduct: {
+        type: Boolean
+    },
+    addChain: {
+        type: Boolean
+    },
+    pointersWeight: {
+        type: Number
+    },
+    colouredStone: [
+        {
+            type: String,
+            enum: ["Solitare", "Pointer"]
+        }
+    ],
+    gemStoneWeightPointer: {
+        type: String,
+    }
 }, { timestamps: true });
 
 export const Product = mongoose.model("Product", productSchema);

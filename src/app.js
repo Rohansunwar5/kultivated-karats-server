@@ -18,6 +18,7 @@ import subCategoryRouter from "./routes/subCategories.routes.js"
 import testimonialRouter from "./routes/testimonials.routes.js"
 import voucherRouter from "./routes/vouchers.routes.js"
 import paymentRouter from "./routes/payment.routes.js";
+import emailRouter from "./routes/email.routes.js";
 
 const app = express();
 
@@ -61,5 +62,6 @@ app.use("/api/v1/sub-categories", subCategoryRouter);
 app.use("/api/v1/testimonials", testimonialRouter);
 app.use("/api/v1/vouchers", voucherRouter);
 app.use("/api/v1/payment", paymentRouter);
+app.use("/api/v1/email", emailRouter);
 
 export { app };

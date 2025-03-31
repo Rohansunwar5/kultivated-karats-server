@@ -6,9 +6,9 @@ const router = Router();
 
 /* Secured routed */
 
-router.route("/get-all-orders").get(getAllOrders);
+router.route("/get-all-orders").get(verifyJWT, getAllOrders);
 // router.route("/get-orders/:custormerId").get(verifyJWT, getAnOrder);
-router.route("/create-an-order").post(createAnOrder);
+router.route("/create-an-order").post(verifyJWT, createAnOrder);
 router.route("/update-an-order/:orderId").patch(verifyJWT, updateAnOrder);
 router.route("/delete-an-order/:orderId").delete(verifyJWT, deleteAnOrder);
 router.route("/delete-multiple-orders").delete(verifyJWT, deleteMultipleOrders);

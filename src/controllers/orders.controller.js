@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Order } from "../models/orders.model.js";
 import { User } from "../models/users.model.js";
 import { ApiError } from "../utils/ApiError.js";
@@ -31,12 +32,14 @@ const createAnOrder = asyncHandler( async (req, res) => {
             throw new ApiError(400, "No order object recieved!");
     
         const newOrder = await Order.create(order);
+
         if ( !newOrder )
             throw new ApiError(500, "Error while creating order!");
-            
-        // const user = await User.findByIdAndUpdate({ _id: req?.user?._id }, { orders: [ ...req?.user?.orders, new mongoose.Types.ObjectId(newOrder?._id) ] })
-        // console.log(user);
-        return res.status(200).json(new ApiResponse(200, newOrder, "order created successfully!"));    
+        const user = await User.findByIdAndUpdate({ _id: req?.user?._id }, { $push: { orders: new mongoose.Types.ObjectId(newOrder?._id) } }, { new: true, runValidators: true }).populate("wishList.product").populate("videoCallCart.product").populate("cart.product").populate("orders").populate("orders.product").select("-password -refreshToken");
+        
+        console.log(user);
+        
+        return res.status(200).json(new ApiResponse(200, user, "order created successfully!"));    
     } catch (error) {
         let errorMessage;
         let type;
