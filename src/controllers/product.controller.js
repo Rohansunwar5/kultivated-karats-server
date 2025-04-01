@@ -3,8 +3,6 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { getDiamondPrice } from "../utils/DiamondPriceCalculation.js";
-import { Collection } from "../models/collections.model.js";
-
 import xlsx from "xlsx"; 
 import fs from "fs";
 import { Collection } from "../models/collections.model.js";
