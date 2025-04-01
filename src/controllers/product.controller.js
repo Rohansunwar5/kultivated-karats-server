@@ -1,9 +1,12 @@
-import mongoose from "mongoose";
 import { Product } from "../models/products.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { getDiamondPrice } from "../utils/DiamondPriceCalculation.js";
+
+import xlsx from "xlsx"; 
+import fs from "fs";
+import { Collection } from "../models/collections.model.js";
 
 const getAllProducts = asyncHandler( async (req, res) => {
 
@@ -196,7 +199,7 @@ const uploadProductsFromExcel = asyncHandler(async (req, res) => {
                 gender
             } = row;
 
-            const collectionNames = collections.split(",").map((name) => name.trim().toLowerCase());
+            const collectionNames = collections.split("&").map((name) => name.trim().toLowerCase());
             const collectionIds = [];
             for (const collectionName of collectionNames) {
                 let collectionDoc = await Collection.findOne({ name: collectionName });
