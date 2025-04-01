@@ -170,6 +170,81 @@ const createAProduct = asyncHandler( async (req, res) => {
     }
 });
 
+const uploadProductsFromExcel = asyncHandler(async (req, res) => {
+    try {
+
+        if (!req.file) {
+            throw new ApiError(400, "No file uploaded.");
+        }
+        console.log("Uploaded file path:", req.file.path);
+
+        const workbook = xlsx.readFile(req.file.path);
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const data = xlsx.utils.sheet_to_json(worksheet);
+        for (const row of data) {
+            const {
+                productId,
+                collections,
+                name,
+                netWeight,
+                solitareWeight,
+                diamondWeight,
+                multiDiamondWeight,
+                shapeOfMultiDiamonds,
+                goldColor,
+                gender
+            } = row;
+
+            const collectionNames = collections.split(",").map((name) => name.trim().toLowerCase());
+            const collectionIds = [];
+            for (const collectionName of collectionNames) {
+                let collectionDoc = await Collection.findOne({ name: collectionName });
+                if (!collectionDoc) {
+                    collectionDoc = await Collection.create({ name: collectionName });
+                    console.log(`New collection created: ${collectionDoc.name}`);
+                }
+                collectionIds.push(collectionDoc._id); 
+            }
+        
+            const product = await Product.findOneAndUpdate(
+                { productId },
+                {
+                    productId,
+                    code: productId,
+                    name,
+                    collections: collectionIds,
+                    netWeight,
+                    diamondWeight,
+                    solitareWeight,
+                    multiDiamondWeight,
+                    shapeOfMultiDiamonds,
+                    goldColor: goldColor.split(",").map((color) => color.trim().toLowerCase()),
+                    gender
+                },
+                { upsert: true, new: true }
+            );
+         
+            for (const collectionId of collectionIds) {
+                await Collection.findByIdAndUpdate(
+                    collectionId,
+                    { $addToSet: { products: product._id } },
+                    { new: true }
+                );
+            }
+            console.log(`Product processed: ${product.name}`);
+        }
+        fs.unlinkSync(req.file.path);
+        return res
+            .status(200)
+            .json(new ApiResponse(200, {}, "Products uploaded successfully."));
+    } catch (error) {
+        console.error("Error uploading products:", error);
+        throw new ApiError(500, error.message || "Internal Server Error");
+    }
+});
+
+
 const mapImagesToProducts =  asyncHandler( async (req, res) => {
     try {
         const { imageList } = req.body;
@@ -250,4 +325,4 @@ const setBasePrice =  asyncHandler( async (req, res) => {
     }
 });
 
-export { getAProduct, setBasePrice, mapImagesToProducts, getAllProducts, updateAProduct, deleteAProduct, deleteMultipleProducts, getAllProductsInACategory, createAProduct};
+export { getAProduct, setBasePrice, mapImagesToProducts, getAllProducts, updateAProduct, deleteAProduct, deleteMultipleProducts, getAllProductsInACategory, createAProduct, uploadProductsFromExcel};

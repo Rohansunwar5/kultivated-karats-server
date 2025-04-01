@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import { createAProduct, deleteAProduct, deleteMultipleProducts, getAProduct, getAllProducts, getAllProductsInACategory, mapImagesToProducts, setBasePrice, updateAProduct } from "../controllers/product.controller.js";
+import { createAProduct, deleteAProduct, deleteMultipleProducts, getAProduct, getAllProducts, getAllProductsInACategory, mapImagesToProducts, setBasePrice, updateAProduct, uploadProductsFromExcel } from "../controllers/product.controller.js";
+import { uploadXLSX } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
@@ -11,6 +12,7 @@ const router = Router();
 router.route("/get-all-products").get(getAllProducts);
 router.route("/get-product/:id").get(getAProduct);
 router.route("/get-products/:category").get(getAllProductsInACategory);
+router.route("/upload-products-from-excel").post(uploadXLSX.single('file'), uploadProductsFromExcel);
 
 /* Secured routes */
 
