@@ -75,7 +75,7 @@ const productSchema = new mongoose.Schema({
         {
             type: String,
             required: true,
-            enum: [ "Rose", "Yellow", "White" ]
+            // enum: [ "Rose", "Yellow", "White" ]
         }
     ],
     shapeOfSolitare: {

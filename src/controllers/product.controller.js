@@ -1,9 +1,9 @@
-import mongoose from "mongoose";
 import { Product } from "../models/products.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { getDiamondPrice } from "../utils/DiamondPriceCalculation.js";
+import { Collection } from "../models/collections.model.js";
 
 const getAllProducts = asyncHandler( async (req, res) => {
 
@@ -193,7 +193,16 @@ const uploadProductsFromExcel = asyncHandler(async (req, res) => {
                 multiDiamondWeight,
                 shapeOfMultiDiamonds,
                 goldColor,
-                gender
+                gender,
+                gemStoneWeightPointer,
+                colouredStone,
+                pointersWeight,
+                addChain,
+                isMrpProduct,
+                gemStoneWeight,
+                containsGemstone,
+                isPendantFixed,
+                shapeOfSolitare,
             } = row;
 
             const collectionNames = collections.split(",").map((name) => name.trim().toLowerCase());
@@ -220,7 +229,16 @@ const uploadProductsFromExcel = asyncHandler(async (req, res) => {
                     multiDiamondWeight,
                     shapeOfMultiDiamonds,
                     goldColor: goldColor.split(",").map((color) => color.trim().toLowerCase()),
-                    gender
+                    gender,
+                    gemStoneWeightPointer,
+                    colouredStone,
+                    pointersWeight,
+                    addChain,
+                    isMrpProduct,
+                    gemStoneWeight,
+                    containsGemstone,
+                    isPendantFixed,
+                    shapeOfSolitare,
                 },
                 { upsert: true, new: true }
             );
@@ -248,35 +266,14 @@ const uploadProductsFromExcel = asyncHandler(async (req, res) => {
 const mapImagesToProducts =  asyncHandler( async (req, res) => {
     try {
         const { imageList } = req.body;
-    
-        // if ( !(req?.user?.role === "Admin") )
-        //     throw new ApiError(400, "Unauthorized requrest!");
-    
+
         if ( !imageList )
             throw new ApiError(500, "Error while mapping the products!");
-            
-        // const allProducts = await Product.find();
-
-        // imageList?.forEach(element => {
-            // console.log(element);
-            // const product = Product.find({ productId: ima })
-        // });
-        // console.log(imageList?.data);
 
         for (const element in imageList?.data) {
-            // const product = Product.find({ productId: element });
-            // if ( !product )
-                // continue;
-
             const updatedProduct = await Product.findOneAndUpdate({ productId: element }, { imageUrl: imageList?.data?.[`${element}`] });    
-            // console.log(imageList?.data?.[`${element}`], element);
             console.log(updatedProduct);
         };
-    
-        /* Todo: Handle images */
-    
-        // if ( !newProduct )
-            // throw new ApiError(500, "Error while creating the product!");
     
         return res.status(200).json(new ApiResponse(200, "Images mapped successfully!"));    
     } catch (error) {
