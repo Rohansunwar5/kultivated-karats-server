@@ -284,44 +284,35 @@ const mapImagesToProducts =  asyncHandler( async (req, res) => {
     }
 });
 
-const setBasePrice =  asyncHandler( async (req, res) => {
+const setBasePrice = asyncHandler(async (req, res) => {
     try {
-        // const { imageList } = req.body;
-    
-        // if ( !(req?.user?.role === "Admin") )
-        //     throw new ApiError(400, "Unauthorized requrest!");
-    
-        // if ( !imageList )
-            // throw new ApiError(500, "Error while mapping the products!");
-    
         const allProducts = await Product.find();
 
-        allProducts.forEach(element => {
-            const diamondPrice = getDiamondPrice({ netWeight:element?.netWeight, diamondWeight: element?.diamondWeight, solitareWeight: element?.solitareWeight, multiDiaWeight: element?.multiDiamondWeight });
-            const updatedProduct = Product.findOneAndUpdate({ _id: element?._id },{ $set: { price: diamondPrice}}, { new: true});
-            console.log(element?.netWeight, element?.diamondWeight, element?.solitareWeight, element?.multiDiamondWeight);
-            console.log(updatedProduct);
-        });
+        // Using a for...of loop to handle async updates properly
+        for (const element of allProducts) {
+            const diamondPrice = getDiamondPrice({ 
+                karat: 14, 
+                netWeight: element?.netWeight, 
+                solitareWeight: element?.solitareWeight, 
+                multiDiaWeight: element?.multiDiamondWeight 
+            }).subTotal;
 
-        // const allProducts = await Product.find();
+            // Awaiting the update to ensure it completes
+            await Product.findOneAndUpdate(
+                { _id: element?._id }, 
+                { $set: { price: diamondPrice } }, 
+                { new: true }
+            );
 
-        // imageList?.forEach(element => {
-            // console.log(element);
-            // const product = Product.find({ productId: ima })
-        // });
-        // console.log(imageList?.data);
+            console.log(element?.netWeight, element?.solitareWeight, element?.multiDiamondWeight);
+        }
 
-    
-        /* Todo: Handle images */
-    
-        // if ( !newProduct )
-            // throw new ApiError(500, "Error while creating the product!");
-    
         return res.status(200).json(new ApiResponse(200, "Base price set successfully!"));    
-    } catch (error) {
+    } catch (error) { 
         console.log(error);
-        return res.status(400).json({ error, errorMessage, type });
+        return res.status(400).json({ error });
     }
 });
+
 
 export { getAProduct, setBasePrice, mapImagesToProducts, getAllProducts, updateAProduct, deleteAProduct, deleteMultipleProducts, getAllProductsInACategory, createAProduct, uploadProductsFromExcel};
