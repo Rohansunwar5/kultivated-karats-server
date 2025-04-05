@@ -197,13 +197,13 @@ const updateAccountDetails = asyncHandler( async(req, res) => {
     
         console.log(user);
         
-        let currentUser;
+        // let currentUser;
     
-        if ( updateType == "self")
-            currentUser = await User.findByIdAndUpdate(req.user?._id, {...user}, { new: true }).select("-password -refreshToken").pupulate("wishList.product").populate("cart.product").populate("orders");
+        // if ( updateType == "self")
+        const currentUser = await User.findByIdAndUpdate(req.user?._id, {...user}, { new: true }).select("-password -refreshToken").populate("wishList.product").populate("cart.product").populate("orders");
     
-        else if ( updateType == "other")
-            currentUser = await User.findByIdAndUpdate(user?._id, {...user}, { new: true }).select("-password -refreshToken").pupulate("wishList.product").populate("cart.product").populate("orders");
+        // else if ( updateType == "other")
+            // currentUser = await User.findByIdAndUpdate(user?._id, {...user}, { new: true }).select("-password -refreshToken").pupulate("wishList.product").populate("cart.product").populate("orders");
     
         console.log(updateType, currentUser);
     

@@ -141,7 +141,7 @@ const productSchema = new mongoose.Schema({
         }
     ],
     gemStoneWeightPointer: {
-        type: String,
+        type: Number,
     }
 }, { timestamps: true });
 

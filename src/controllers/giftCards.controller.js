@@ -32,13 +32,13 @@ const createAGiftCard = asyncHandler( async (req, res) => {
     try {
         const { giftCardData } = req.body;
     
-        if ( !(req?.user?.role == "Admin") )
-            throw new ApiError(400, "Unauthorized request!");
+        // if ( !(req?.user?.role == "Admin") )
+        //     throw new ApiError(400, "Unauthorized request!");
         
         if ( !giftCardData )
             throw new ApiError(400, "GiftCard data not present in the request!");
     
-        const createdGiftCard = await GiftCard.create(couponData);
+        const createdGiftCard = await GiftCard.create(giftCardData);
     
         if ( !createdGiftCard )
             throw new ApiError(500, "Failed to create coupon!");
