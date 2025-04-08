@@ -97,7 +97,7 @@ const productSchema = new mongoose.Schema({
     },
     price: {
         type: Number,
-        required: true,
+        // required: true,
     },
     quantitySold: {
         type: Number,
@@ -107,11 +107,11 @@ const productSchema = new mongoose.Schema({
         {
             url: {
                 type: String,
-                required: true
+                // required: true
             },
             publicId: {
                 type: String,
-                required: true
+                // required: true
             }
         }
     ],
