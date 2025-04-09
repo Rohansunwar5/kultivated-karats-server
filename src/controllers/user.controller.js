@@ -189,6 +189,60 @@ const refreshAccessToken = asyncHandler( async (req, res) => {
     }        
 });
 
+
+const googleLogin = asyncHandler(async (req, res) => {
+    try {
+        const { token } = req.body;
+        
+        if (!token) {
+            throw new ApiError(400, "Google token is required");
+        }
+
+        const payload = await verifyGoogleToken(token);
+        const { user, accessToken, refreshToken } = await handleGoogleUser(payload);
+
+        return res.status(200)
+            .cookie("accessToken", accessToken, cookieOptions)
+            .cookie("refreshToken", refreshToken, cookieOptions)
+            .json(new ApiResponse(200, {
+                user, accessToken, refreshToken
+            }, "Google login successful"));
+    } catch (error) {
+        console.error("Google login error:", error);
+        res.status(error?.statusCode || 500).json(error);
+    }
+});
+
+const googleSSO = asyncHandler(async (req, res) => {
+    try {
+        const { code } = req.body;
+        
+        if (!code) {
+            throw new ApiError(400, "Authorization code is required");
+        }
+
+        const { tokens } = await googleClient.getToken(code);
+        if (!tokens.id_token) {
+            throw new ApiError(400, "Invalid authorization code");
+        }
+
+        const payload = await verifyGoogleToken(tokens.id_token);
+        const { user, accessToken, refreshToken } = await handleGoogleUser(payload);
+
+        return res.status(200)
+            .cookie("accessToken", accessToken, cookieOptions)
+            .cookie("refreshToken", refreshToken, cookieOptions)
+            .json(new ApiResponse(200, {
+                user, accessToken, refreshToken
+            }, "Google login successful"));
+    } catch (error) {
+        console.error("Google SSO error:", error);
+        res.status(error?.statusCode || 500).json(error);
+    }
+});
+
+
+
 const updateAccountDetails = asyncHandler( async(req, res) => {
     try {
         const { user } = req.body;
@@ -371,4 +425,4 @@ const deleteMultipleCustomers = asyncHandler( async(req, res) => {
 //     const orders = user?.orders;
 // });
 
-export { getAllCustomers, registerUser, loginUser, logoutUser, refreshAccessToken, updateAccountDetails, getCurrentUser, updateUserCart, updateUserWishList, updateUserVideoCallCart, deleteACustomer, deleteMultipleCustomers };
+export { getAllCustomers, registerUser, loginUser, logoutUser, refreshAccessToken, updateAccountDetails, getCurrentUser, updateUserCart, updateUserWishList, updateUserVideoCallCart, deleteACustomer, deleteMultipleCustomers, googleLogin , googleSSO};
