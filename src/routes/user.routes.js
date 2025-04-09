@@ -1,11 +1,13 @@
 import { Router } from "express";
-import { getAllCustomers, getCurrentUser, loginUser, logoutUser, refreshAccessToken, registerUser, updateAccountDetails, updateUserCart, updateUserWishList, deleteACustomer, deleteMultipleCustomers, updateUserVideoCallCart } from "../controllers/user.controller.js";
+import { getAllCustomers, getCurrentUser, loginUser, logoutUser, refreshAccessToken, registerUser, updateAccountDetails, updateUserCart, updateUserWishList, deleteACustomer, deleteMultipleCustomers, updateUserVideoCallCart, googleLogin, googleSSO } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
 router.route("/register").post(registerUser);
 router.route("/login").post(loginUser);
+router.route('/google/login').post(googleLogin);
+router.route('/google/sso').post(googleSSO);
 router.route("/get-all-customers").get(getAllCustomers);
 
 /* Secured routes */

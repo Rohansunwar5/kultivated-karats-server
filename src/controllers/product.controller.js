@@ -5,7 +5,9 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { getDiamondPrice } from "../utils/DiamondPriceCalculation.js";
 import xlsx from "xlsx"; 
 import fs from "fs";
-import { Collection } from "../models/collections.model.js";
+import { Category } from "../models/categories.model.js";
+import { SubCategory } from "../models/subCategories.model.js";
+// import { Collection } from "../models/collections.model.js";
 
 const getAllProducts = asyncHandler( async (req, res) => {
 
@@ -174,7 +176,6 @@ const createAProduct = asyncHandler( async (req, res) => {
 
 const uploadProductsFromExcel = asyncHandler(async (req, res) => {
     try {
-
         if (!req.file) {
             throw new ApiError(400, "No file uploaded.");
         }
@@ -184,53 +185,75 @@ const uploadProductsFromExcel = asyncHandler(async (req, res) => {
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         const data = xlsx.utils.sheet_to_json(worksheet);
-        for (const row of data) {
-            const {
-                productId,
-                collections,
-                name,
-                netWeight,
-                solitareWeight,
-                diamondWeight,
-                multiDiamondWeight,
-                shapeOfMultiDiamonds,
-                goldColor,
-                gender,
-                gemStoneWeightPointer,
-                colouredStone,
-                pointersWeight,
-                addChain,
-                isMrpProduct,
-                gemStoneWeight,
-                containsGemstone,
-                isPendantFixed,
-                shapeOfSolitare,
-            } = row;
 
-            const collectionNames = collections.split("&").map((name) => name.trim().toLowerCase());
-            const collectionIds = [];
-            for (const collectionName of collectionNames) {
-                let collectionDoc = await Collection.findOne({ name: collectionName });
-                if (!collectionDoc) {
-                    collectionDoc = await Collection.create({ name: collectionName });
-                    console.log(`New collection created: ${collectionDoc.name}`);
-                }
-                collectionIds.push(collectionDoc._id); 
+        // Helper functions
+        const safeNumber = (value) => {
+            if (value === null || value === undefined || value === '' || value === 'null') {
+                return undefined;
             }
-        
-            const product = await Product.findOneAndUpdate(
-                { productId },
-                {
+            const num = Number(value);
+            return isNaN(num) ? undefined : num;
+        };
+
+        const safeArray = (value, delimiter = ',') => {
+            if (!value) return undefined;
+            return value.split(delimiter).map(item => item.trim().toLowerCase());
+        };
+
+        const safeBoolean = (value) => {
+            if (value === null || value === undefined || value === '') return undefined;
+            return Boolean(value);
+        };
+
+        const splitCollections = (collectionsString) => {
+            if (!collectionsString) return [];
+            return collectionsString
+                .split('&')
+                .flatMap(part => part.split(','))
+                .map(name => name.trim().toLowerCase())
+                .filter(name => name);
+        };
+
+        // Function to process subcategories (similar to collections but with category relationship)
+        const processSubCategories = async (subCategoryString, categoryDoc) => {
+            if (!subCategoryString) return [];
+            
+            const subCategoryNames = subCategoryString
+                .split('&')
+                .flatMap(part => part.split(','))
+                .map(name => name.trim().toLowerCase())
+                .filter(name => name);
+
+            const subCategoryIds = [];
+            for (const subCatName of subCategoryNames) {
+                let subCategoryDoc = await SubCategory.findOne({ name: subCatName });
+                if (!subCategoryDoc) {
+                    subCategoryDoc = await SubCategory.create({ 
+                        name: subCatName,
+                        description: "Imported from Excel",
+                        parentCategory: categoryDoc?._id
+                    });
+                    console.log(`New subcategory created: ${subCatName}`);
+                }
+                subCategoryIds.push(subCategoryDoc._id);
+            }
+            return subCategoryIds;
+        };
+
+        for (const row of data) {
+            try {
+                const {
                     productId,
-                    code: productId,
+                    collections,
                     name,
-                    collections: collectionIds,
+                    category,
+                    subCategory,
                     netWeight,
-                    diamondWeight,
                     solitareWeight,
+                    diamondWeight,
                     multiDiamondWeight,
                     shapeOfMultiDiamonds,
-                    goldColor: goldColor.split(",").map((color) => color.trim().toLowerCase()),
+                    goldColor,
                     gender,
                     gemStoneWeightPointer,
                     colouredStone,
@@ -241,50 +264,176 @@ const uploadProductsFromExcel = asyncHandler(async (req, res) => {
                     containsGemstone,
                     isPendantFixed,
                     shapeOfSolitare,
-                },
-                { upsert: true, new: true }
-            );
-         
-            for (const collectionId of collectionIds) {
-                await Collection.findByIdAndUpdate(
-                    collectionId,
-                    { $addToSet: { products: product._id } },
-                    { new: true }
+                } = row;
+
+                // Process category
+                let categoryDoc = null;
+                if (category) {
+                    const categoryName = category.trim().toLowerCase();
+                    categoryDoc = await Category.findOne({ name: categoryName });
+                    if (!categoryDoc) {
+                        categoryDoc = await Category.create({ 
+                            name: categoryName,
+                            description: "Imported from Excel"
+                        });
+                        console.log(`New category created: ${categoryName}`);
+                    }
+                }
+
+                // Process subcategories (handles both & and , as delimiters)
+                const subCategoryIds = await processSubCategories(subCategory, categoryDoc);
+
+                // Process collections
+                const collectionNames = splitCollections(collections);
+                const collectionIds = [];
+                for (const collectionName of collectionNames) {
+                    let collectionDoc = await Collection.findOne({ name: collectionName });
+                    if (!collectionDoc) {
+                        collectionDoc = await Collection.create({ name: collectionName });
+                        console.log(`New collection created: ${collectionName}`);
+                    }
+                    collectionIds.push(collectionDoc._id);
+                }
+
+                // Build product data
+                const productData = {
+                    productId,
+                    code: productId,
+                    name,
+                    category: categoryDoc?._id,
+                    subCategories: subCategoryIds,
+                    collections: collectionIds,
+                    netWeight: safeNumber(netWeight),
+                    diamondWeight: safeNumber(diamondWeight),
+                    solitareWeight: safeNumber(solitareWeight),
+                    multiDiamondWeight: safeNumber(multiDiamondWeight),
+                    shapeOfMultiDiamonds: shapeOfMultiDiamonds?.trim(),
+                    goldColor: safeArray(goldColor),
+                    gender: gender?.trim(),
+                    gemStoneWeightPointer: gemStoneWeightPointer?.trim(),
+                    colouredStone: safeArray(colouredStone),
+                    pointersWeight: safeNumber(pointersWeight),
+                    addChain: safeBoolean(addChain),
+                    isMrpProduct: safeBoolean(isMrpProduct),
+                    gemStoneWeight: safeNumber(gemStoneWeight),
+                    containsGemstone: safeBoolean(containsGemstone),
+                    isPendantFixed: safeBoolean(isPendantFixed),
+                    shapeOfSolitare: shapeOfSolitare?.trim(),
+                };
+
+                // Remove undefined values
+                Object.keys(productData).forEach(key => {
+                    if (productData[key] === undefined) {
+                        delete productData[key];
+                    }
+                });
+
+                // Create/update product
+                const product = await Product.findOneAndUpdate(
+                    { productId },
+                    productData,
+                    { upsert: true, new: true }
                 );
+
+                // Update collections with product reference
+                for (const collectionId of collectionIds) {
+                    await Collection.findByIdAndUpdate(
+                        collectionId,
+                        { $addToSet: { products: product._id } },
+                        { new: true }
+                    );
+                }
+
+                console.log(`Product processed: ${product.name}`);
+            } catch (rowError) {
+                console.error(`Error processing row with productId ${row.productId || 'unknown'}:`, rowError);
             }
-            console.log(`Product processed: ${product.name}`);
         }
+
         fs.unlinkSync(req.file.path);
-        return res
-            .status(200)
-            .json(new ApiResponse(200, {}, "Products uploaded successfully."));
+        return res.status(200).json(new ApiResponse(200, {}, "Products uploaded successfully."));
     } catch (error) {
         console.error("Error uploading products:", error);
+        if (req.file?.path && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
         throw new ApiError(500, error.message || "Internal Server Error");
-    }
+    }   // rohan sunwar is a handsome guy
 });
 
-
-const mapImagesToProducts =  asyncHandler( async (req, res) => {
+const mapImagesToProducts = asyncHandler(async (req, res) => {
     try {
         const { imageList } = req.body;
 
-        if ( !imageList )
-            throw new ApiError(500, "Error while mapping the products!");
+        if (!imageList) {
+            throw new ApiError(400, "Image list is required");
+        }
 
-        for (const element in imageList?.data) {
-            const updatedProduct = await Product.findOneAndUpdate({ productId: element }, { imageUrl: imageList?.data?.[`${element}`] });    
-            console.log(updatedProduct);
-        };
-    
-        return res.status(200).json(new ApiResponse(200, "Images mapped successfully!"));    
+        // Get all products at once for efficiency
+        const allProducts = await Product.find({});
+        
+        // Create a map of normalized product IDs to product documents
+        const productMap = {};
+        allProducts.forEach(product => {
+            const normalizedId = product.productId.toLowerCase().replace(/\s+/g, ' ').trim();
+            productMap[normalizedId] = product;
+        });
+
+        let updateCount = 0;
+        const updatePromises = [];
+
+        for (const [imageKey, imageDataArray] of Object.entries(imageList)) {
+            if (!Array.isArray(imageDataArray) || imageDataArray.length === 0) continue;
+
+            // Normalize the image key
+            const normalizedImageKey = imageKey
+                .replace(/_/g, ' ')          // Replace underscores with spaces
+                .replace(/\.(webp|jpg|jpeg|png)$/i, '') // Remove file extensions
+                .toLowerCase()
+                .trim();
+
+            // Find matching product
+            const matchingProduct = productMap[normalizedImageKey];
+            
+            if (matchingProduct) {
+                // Format the image data to match your schema requirements
+                const formattedImages = imageDataArray.map(img => ({
+                    url: img.url,
+                    publicId: img.publicId,
+                    // Add any other required fields here
+                    isPrimary: false // Example field, adjust as needed
+                }));
+
+                updatePromises.push(
+                    Product.findByIdAndUpdate(
+                        matchingProduct._id,
+                        { 
+                            $set: { 
+                                imageUrl: formattedImages 
+                            } 
+                        },
+                        { new: true }
+                    )
+                );
+                updateCount++;
+            }
+        }
+
+        await Promise.all(updatePromises);
+        
+        return res.status(200).json(
+            new ApiResponse(200, `Successfully mapped ${updateCount} images to products`)
+        );
     } catch (error) {
-        console.log(error);
-        return res.status(400).json({ error, errorMessage, type });
+        console.error("Error in mapImagesToProducts:", error);
+        return res.status(500).json(
+            new ApiError(500, error.message || "Failed to map images to products")
+        );
     }
 });
 
 const setBasePrice = asyncHandler(async (req, res) => {
+
     try {
         const allProducts = await Product.find();
 
