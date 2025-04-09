@@ -9,11 +9,11 @@ const productSchema = new mongoose.Schema({
     },
     name: {
         type: String,
-        required: true,
+        // required: true,
     },
     category: {
         type: Schema.Types.ObjectId,
-        required: true,
+        // required: true,
         ref: "Category"
     },
     subCategories: [
@@ -32,23 +32,23 @@ const productSchema = new mongoose.Schema({
     ],
     goldWeight: {
         type: Number,
-        required: true,
+        // required: true,
     },
     diamondWeight: {
         type: Number,
-        required: true
+        // required: true
     },
     netWeight: {
         type: Number,
-        required: true
+        // required: true
     },
     solitareWeight: {
         type: Number,
-        required: true
+        // required: true
     },
     grossWeight: {
         type: Number,
-        required: true
+        // required: true
     },
     noOfSolitares: {
         type: Number,
@@ -60,32 +60,41 @@ const productSchema = new mongoose.Schema({
     },
     multiDiamondWeight: {
         type: Number,
-        required: true
+        // required: true
     },
     totalKarats: [{
         type: Number,
-        required: true
+        // required: true,
     }],
     gender: {
         type: String,
-        required: true,
+        // required: true,
         enum: [ "Male", "Female", "Unisex" ]
     },
     goldColor: [
         {
             type: String,
-            required: true,
+            // required: true,
             // enum: [ "Rose", "Yellow", "White" ]
         }
     ],
     shapeOfSolitare: {
         type: String,
-        required: true,
+        // required: true,
     },
     shapeOfMultiDiamonds: {
         type: String,
-        required: true,
+        // required: true,
     },
+    shapeOfPointers: {
+        type: String,
+    },
+    noOfPointers: {
+        type: Number
+    },
+    gemStoneColour: [{
+        type: String,
+    }],
     description: {
         type: String,
         default: ""
@@ -120,7 +129,7 @@ const productSchema = new mongoose.Schema({
     },    
     containsGemstone: {
         type: Boolean,
-        required: true
+        // required: true
     },
     gemStoneWeight: {
         type: Number
