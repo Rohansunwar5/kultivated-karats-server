@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import { createACategory, deleteACategory, getAllCategories, updateACategory } from "../controllers/category.controller.js";
+import { createACategory, deleteACategory, getAllCategories, mapProductsToCategories, updateACategory } from "../controllers/category.controller.js";
 
 const router = Router();
 
 router.route("/get-all-categories").get(getAllCategories);
+router.route("/map-products-to-categories").patch(mapProductsToCategories);
 
 /* Secured routed */
 

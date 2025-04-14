@@ -1,16 +1,41 @@
+import mongoose from "mongoose";
 import { Category } from "../models/categories.model.js";
+import { Product } from "../models/products.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 const getAllCategories = asyncHandler( async ( _, res) => {
-    const categories = await Category.find().populate("banners");
+    try {
+        const categories = await Category.find().populate("banners").populate("products");
 
-    if ( !categories )
-        throw new ApiError(500, "Internal server error!");
-
-    return res.status(200).json(new ApiResponse(200, categories, "Categories fetched successfully!"));
+        if ( !categories )
+            throw new ApiError(500, "Internal server error!");
+    
+        return res.status(200).json(new ApiResponse(200, categories, "Categories fetched successfully!"));    
+    } catch (error) {
+        return res.status((error?.status || 500)).json(new ApiResponse((error?.status || 500), error, "Failed!"));
+    }
 });
+
+const mapProductsToCategories = asyncHandler( async ( _, res ) => {
+    try {
+        const categories = await Category.find();
+        const products = await Product.find().populate("category");
+        
+        categories?.forEach( async category => {
+            const productsInCategory = products?.filter(product => product?.category?.name == category?.name);
+            const productsWithObjectId = productsInCategory?.map(product => new mongoose.Types.ObjectId(product?._id));
+            const updatedCategory = await Category?.findOneAndUpdate({ name: category?.name }, { products: productsWithObjectId }, { new : true });
+            console.log(updatedCategory)
+        });
+
+        return res.status(200).json(new ApiResponse(200, categories, "Categories updated successfully!"));    
+
+    } catch (error) {
+        return res.status(500).json(new ApiResponse(500, error, "Failed to updated categories!"));    
+    }
+})
 
 const createACategory = asyncHandler( async (req, res) => {
     try {
@@ -85,4 +110,4 @@ const deleteACategory = asyncHandler( async (req, res ) => {
     res.status(200).json(new ApiResponse(200, deleteResponse, "Category successfully deleted!"));
 });
 
-export { getAllCategories, createACategory, updateACategory, deleteACategory };
+export { mapProductsToCategories, getAllCategories, createACategory, updateACategory, deleteACategory };

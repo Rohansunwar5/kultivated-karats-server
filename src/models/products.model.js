@@ -131,17 +131,20 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         // required: true
     },
-    gemStoneWeight: {
-        type: Number
+    gemStoneWeightSol: {
+        type: Number,
+        default: 0
     },
     isMrpProduct: {
-        type: Boolean
+        type: Boolean,
+        default: false
     },
     addChain: {
         type: Boolean
     },
     pointersWeight: {
-        type: Number
+        type: Number,
+        default: 0
     },
     colouredStone: [
         {
@@ -151,6 +154,7 @@ const productSchema = new mongoose.Schema({
     ],
     gemStoneWeightPointer: {
         type: Number,
+        default: 0
     }
 }, { timestamps: true });
 

@@ -4,6 +4,8 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 import { ApiError } from "../utils/ApiError.js"
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import { handleGoogleUser, verifyGoogleToken } from "./goggleAuth.js";
+import twilio from "twilio";
 
 /* Important : fix and update code for guest user */
 
@@ -33,7 +35,7 @@ const registerUser = asyncHandler( async (req, res) => {
     try {
         let createUserResponse;
         
-        const { role } = req.body;
+        // const { role } = req.body;
 
         // if ( role ) {
         //     createUserResponse = await User.create();
@@ -41,8 +43,7 @@ const registerUser = asyncHandler( async (req, res) => {
         // } else
         // {
             
-            const { email, phoneNumber} = req.body.userData;
-            const userData = req.body.userData;
+            const { firstName, lastName, email } = req.body;
 
             if (!(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email))) throw new ApiError(400, "Invalid email address!");
             
@@ -50,7 +51,7 @@ const registerUser = asyncHandler( async (req, res) => {
             
             const existingUserEmail = await User.findOne({ email });
             
-            const existingUserPhone = await User.findOne({ phoneNumber });
+            const existingUserPhone = await User.findOne({ phoneNumber: req?.phone });
             
             // console.log(existingUser);
             
@@ -72,7 +73,7 @@ const registerUser = asyncHandler( async (req, res) => {
                 throw error;
             }
 
-            createUserResponse = await User.create(userData);
+            createUserResponse = await User.create({ email: email, phoneNumber: req?.phone, firstName: firstName, lastName: lastName });
         
             const user = await User.findById(createUserResponse._id).select("-password -refreshToken");
             if ( !user ) throw new ApiError(500, "Internal server error!");
@@ -86,22 +87,24 @@ const registerUser = asyncHandler( async (req, res) => {
 });
 
 const loginUser = asyncHandler( async(req, res) => {
-    console.log(mongoose.models);
+    // console.log(mongoose.models);
     try {
-        const { email, phoneNumber, password } = req.body;
     
-        if ( !email && !phoneNumber )
-            throw new ApiError(400, "Email or phone number required!");
+        if ( !req?.phone )
+            throw new ApiError(400, "phone number required!");
     
-        const user = await User.findOne({$or: [ { email }, { phoneNumber } ]});
+        const user = await User.findOne({ phoneNumber: req?.phone });
     
+        if ( !req?.otpVerified)
+            throw new ApiError(400, "OTP verification failed!");
+
         if ( !user ) 
-            throw new ApiError(404, "User not found!", [{type: "email", errMsg: "User not found!"}]);
+            throw new ApiError(404, "User not found!", [{type: "phoneNumber", errMsg: "User not found!"}]);
     
-        const isPasswordValid = await user.isPasswordCorrect(password);
+        // const isPasswordValid = await user.isPasswordCorrect(password);
     
-        if  ( !isPasswordValid )
-            throw new ApiError(401, "Invalid password!", [{type: "password", errMsg: "Invalid password!"}]);
+        // if  ( !isPasswordValid )
+            // throw new ApiError(401, "Invalid password!", [{type: "password", errMsg: "Invalid password!"}]);
     
         const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id);
     
@@ -119,23 +122,57 @@ const loginUser = asyncHandler( async(req, res) => {
 
 });
 
+const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+
+const sendOtp = asyncHandler ( async (req, res) => {
+    try {
+        const { phone } = req.body;
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    
+        if ( !phone )
+            throw new ApiError(401, "Phone number not present in request!");
+
+        const response = await client.messages.create({
+            body: `Your OTP for your account verification at Kultivated Karats is ${otp}`,
+            from: process.env.TWILIO_PHONE_NUMBER,
+            to: `+91${phone}`,
+        });
+          
+        if ( !response )
+            throw new ApiError(401, "Failed to send OTP!");
+            
+        res.status(200).json({ success: true, message: 'OTP sent' });
+
+    } catch (error) {
+        console.log(error);
+        return res.status((error?.status || 500)).json(new ApiResponse((error?.status || 500), "Failed to fetch user!"));       
+    }
+});
+
 const logoutUser = asyncHandler( async (req, res) => {
-    const currentUser = await User.findByIdAndUpdate(
-        req.user._id,
-        {
-            $set: {
-                refreshToken: undefined,
+    try {
+
+        const currentUser = await User.findByIdAndUpdate(
+            req?.user?._id,
+            {
+                $set: {
+                    refreshToken: undefined,
+                }
+            },
+            {
+                new: true
             }
-        },
-        {
-            new: true
-        }
-    );
-
-    if ( !currentUser )
-        throw new ApiError(404, "User not logged in or found in the database!");
-
-    return res.status(200).clearCookie("accessToken", cookieOptions).clearCookie("refreshToken", cookieOptions).json(new ApiResponse(200, {}, "User logged out successfully!"));
+        );
+    
+        if ( !currentUser )
+            throw new ApiError(404, "User not logged in or found in the database!");
+    
+        return res.status(200).clearCookie("accessToken", cookieOptions).clearCookie("refreshToken", cookieOptions).json(new ApiResponse(200, {}, "User logged out successfully!"));
+    } catch (error) {
+        console.log(error);
+        
+        return res.status((error?.status || 500)).json(new ApiResponse((error?.status || 500), {req}, "Failed to fetch user!"));       
+    }
 });
 
 const getCurrentUser = asyncHandler( async(req, res) => {
@@ -425,4 +462,4 @@ const deleteMultipleCustomers = asyncHandler( async(req, res) => {
 //     const orders = user?.orders;
 // });
 
-export { getAllCustomers, registerUser, loginUser, logoutUser, refreshAccessToken, updateAccountDetails, getCurrentUser, updateUserCart, updateUserWishList, updateUserVideoCallCart, deleteACustomer, deleteMultipleCustomers, googleLogin , googleSSO};
+export { getAllCustomers, registerUser, loginUser, logoutUser, refreshAccessToken, updateAccountDetails, getCurrentUser, updateUserCart, updateUserWishList, updateUserVideoCallCart, deleteACustomer, deleteMultipleCustomers, googleLogin , googleSSO, sendOtp };

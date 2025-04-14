@@ -26,6 +26,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
 
 export const verifyGoogleToken = async (token) => {
     try {
+        console.log(token);
         const ticket = await googleClient.verifyIdToken({
             idToken: token,
             audience: process.env.GOOGLE_CLIENT_ID

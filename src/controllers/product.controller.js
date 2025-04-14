@@ -7,6 +7,7 @@ import xlsx from "xlsx";
 import fs from "fs";
 import { Category } from "../models/categories.model.js";
 import { SubCategory } from "../models/subCategories.model.js";
+import mongoose from "mongoose";
 // import { Collection } from "../models/collections.model.js";
 
 const getAllProducts = asyncHandler( async (req, res) => {
@@ -171,6 +172,36 @@ const createAProduct = asyncHandler( async (req, res) => {
         } 
         console.log(error);
         return res.status(400).json({ error, errorMessage, type });
+    }
+});
+
+const addGemstoneField = asyncHandler( async (req, res) => {
+    try {
+        const products = await Product?.find();
+
+        console.log(products.length, typeof products)
+
+        const gemStoneProducts = ['P6', 'P59', 'P60', 'P61', 'P62', 'P63', 'P64', 'P65', '47', '48', '51', '52', '53', '54', '55', '56', '70', '71', '72', '73', '74', '75', '76', '77', '78', '79', '80','Copy of 41', 'Copy of 47' ,'Copy of 52' ,'Copy of 53' ,'Copy of 78' ,'Copy of 79' ,'Copy of 82' ,'Copy of 98' ,'Copy of 99' ,'Copy of 101' ,'Copy of 102' ,'Copy of 105' ,'Copy of 125', 'BR37']
+        
+        const isAGemstone = (id) => {
+            const product = gemStoneProducts?.find(productId => productId == id);
+            if (product) return true;
+            return false;
+        }
+
+        products.forEach(async element => {
+            await Product.findByIdAndUpdate(
+                element?._id,
+                { $set: { containsGemstone: isAGemstone(element?.productId) } },
+                { new: true } // returns the updated document
+              );
+        });
+
+        console.log(products);
+        res.status(500).json({message : "Success"});
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({message : "failed"});
     }
 });
 
@@ -435,9 +466,8 @@ const mapImagesToProducts = asyncHandler(async (req, res) => {
 const setBasePrice = asyncHandler(async (req, res) => {
 
     try {
-        const allProducts = await Product.find();
+        const allProducts = await Product.find({ containsGemstone: false });
 
-        // Using a for...of loop to handle async updates properly
         for (const element of allProducts) {
             const diamondPrice = getDiamondPrice({ 
                 karat: 14, 
@@ -446,12 +476,15 @@ const setBasePrice = asyncHandler(async (req, res) => {
                 multiDiaWeight: element?.multiDiamondWeight 
             }).subTotal;
 
+            console.log(element?.productId, element?.name);
+
             // Awaiting the update to ensure it completes
             await Product.findOneAndUpdate(
                 { _id: element?._id }, 
                 { $set: { price: diamondPrice } }, 
                 { new: true }
             );
+
 
             console.log(element?.netWeight, element?.solitareWeight, element?.multiDiamondWeight);
         }
@@ -463,5 +496,34 @@ const setBasePrice = asyncHandler(async (req, res) => {
     }
 });
 
+const updatePendantField = asyncHandler(async (req, res) => {
 
-export { getAProduct, setBasePrice, mapImagesToProducts, getAllProducts, updateAProduct, deleteAProduct, deleteMultipleProducts, getAllProductsInACategory, createAProduct, uploadProductsFromExcel};
+    try {
+        // const allProducts = await Product.find();
+
+        const fixedPendant = ["P1", "P2", "P3", "P4", "P5", "P7", "P9", "p10", "P12", "P13", "P14", "P17", "P19", "P21", "P23", "P25", "P26", "P27", "P29", "P30", "P31", "P32", "P33", "P34", "P35", "P37", "P47", "P48", "P52", "P53", "P54", "P55", "P58", "P61", "P65"];
+        const notFixedPendant = ["P6", "P8", "P11", "P15", "P16", "P18", "P20", "P22", "P24", "P28", "P36", "P38", "P39", "P40", "P41", "P42", "P43", "P44", "P45", "P46", "P49", "P50", "P51", "P56", "P57", "P59", "P60", "P62", "P63", "P64"];
+
+        // const category = Category?.create({ name: "Pendants", description: "Pendants" });
+
+        fixedPendant.forEach(async pendant => {
+            const updatedPendant = await Product?.findOne({ productId: pendant });
+            const updatedCategory = await Category?.findByIdAndUpdate("67fcc20d5e9ca5ca2a814609", { $push: { products: updatedPendant?._id }});
+            console.log(updatedPendant);
+        });
+
+        notFixedPendant.forEach(async pendant => {
+            const updatedPendant = await Product?.findOne({ productId: pendant });
+            const updatedCategory = await Category?.findByIdAndUpdate("67fcc20d5e9ca5ca2a814609", { $push: { products: updatedPendant?._id }});
+            console.log(updatedPendant);
+        });
+
+        return res.status(200).json(new ApiResponse(200, "Pendants updated successfully!"));    
+    } catch (error) { 
+        console.log(error);
+        return res.status(400).json({ error });
+    }
+});
+
+
+export { addGemstoneField, updatePendantField, getAProduct, setBasePrice, mapImagesToProducts, getAllProducts, updateAProduct, deleteAProduct, deleteMultipleProducts, getAllProductsInACategory, createAProduct, uploadProductsFromExcel};
