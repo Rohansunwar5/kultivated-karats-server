@@ -13,7 +13,12 @@ import mongoose from "mongoose";
 const getAllProducts = asyncHandler( async (req, res) => {
 
     
-    const products = await Product.find().populate("category");
+    const products = await Product.find().populate({
+        path: "category",
+        populate: {
+          path: "products",
+        }
+    });
     
     if ( !products ) 
         throw new ApiError(500, "Internal server error!");
@@ -29,7 +34,12 @@ const getAProduct = asyncHandler( async (req, res) => {
         if ( !id )
             throw new ApiError(404, "No product Id present!");
     
-        const product = await Product.findOne({ _id : id }).populate("category");
+        const product = await Product.findOne({ _id : id }).populate({
+            path: "category",
+            populate: {
+              path: "products",
+            }
+        });
     
         if ( !product ) 
             throw new ApiError(404, "No product with the id '"+id+"' found");

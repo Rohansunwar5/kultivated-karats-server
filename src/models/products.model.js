@@ -71,13 +71,6 @@ const productSchema = new mongoose.Schema({
         // required: true,
         enum: [ "Male", "Female", "Unisex" ]
     },
-    goldColor: [
-        {
-            type: String,
-            // required: true,
-            // enum: [ "Rose", "Yellow", "White" ]
-        }
-    ],
     shapeOfSolitare: {
         type: String,
         // required: true,
@@ -139,19 +132,10 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    addChain: {
-        type: Boolean
-    },
     pointersWeight: {
         type: Number,
         default: 0
     },
-    colouredStone: [
-        {
-            type: String,
-            enum: ["Solitare", "Pointer"]
-        }
-    ],
     gemStoneWeightPointer: {
         type: Number,
         default: 0
