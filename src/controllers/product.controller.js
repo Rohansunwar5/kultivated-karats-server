@@ -2,13 +2,13 @@ import { Product } from "../models/products.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { getDiamondPrice } from "../utils/DiamondPriceCalculation.js";
+import { getProductPriceDetails } from "../utils/DiamondPriceCalculation.js";
 import xlsx from "xlsx"; 
 import fs from "fs";
 import { Category } from "../models/categories.model.js";
 import { SubCategory } from "../models/subCategories.model.js";
 import mongoose from "mongoose";
-// import { Collection } from "../models/collections.model.js";
+import { Collection } from "../models/collections.model.js";
 
 const getAllProducts = asyncHandler( async (req, res) => {
 
@@ -208,7 +208,7 @@ const addGemstoneField = asyncHandler( async (req, res) => {
         });
 
         console.log(products);
-        res.status(500).json({message : "Success"});
+        res.status(200).json({message : "Success"});
     } catch (error) {
         console.log(error);
         res.status(500).json({message : "failed"});
@@ -249,8 +249,8 @@ const uploadProductsFromExcel = asyncHandler(async (req, res) => {
         const splitCollections = (collectionsString) => {
             if (!collectionsString) return [];
             return collectionsString
-                .split('&')
-                .flatMap(part => part.split(','))
+                .split(',')
+                // .flatMap(part => part.split(','))
                 .map(name => name.trim().toLowerCase())
                 .filter(name => name);
         };
@@ -260,18 +260,23 @@ const uploadProductsFromExcel = asyncHandler(async (req, res) => {
             if (!subCategoryString) return [];
             
             const subCategoryNames = subCategoryString
-                .split('&')
+                .split('')
                 .flatMap(part => part.split(','))
                 .map(name => name.trim().toLowerCase())
                 .filter(name => name);
 
             const subCategoryIds = [];
             for (const subCatName of subCategoryNames) {
-                let subCategoryDoc = await SubCategory.findOne({ name: subCatName });
+                let subCategoryDoc = await SubCategory.findOne({ $expr: {
+                    $eq: [
+                      { $toLower: { $trim: { input: "$name" } } },
+                      subCatName.toLowerCase().trim()
+                    ]
+                  } });
                 if (!subCategoryDoc) {
                     subCategoryDoc = await SubCategory.create({ 
                         name: subCatName,
-                        description: "Imported from Excel",
+                        // description: "Imported from Excel",
                         parentCategory: categoryDoc?._id
                     });
                     console.log(`New subcategory created: ${subCatName}`);
@@ -301,7 +306,7 @@ const uploadProductsFromExcel = asyncHandler(async (req, res) => {
                     pointersWeight,
                     addChain,
                     isMrpProduct,
-                    gemStoneWeight,
+                    gemStoneWeightSol,
                     containsGemstone,
                     isPendantFixed,
                     shapeOfSolitare,
@@ -311,11 +316,16 @@ const uploadProductsFromExcel = asyncHandler(async (req, res) => {
                 let categoryDoc = null;
                 if (category) {
                     const categoryName = category.trim().toLowerCase();
-                    categoryDoc = await Category.findOne({ name: categoryName });
+                    categoryDoc = await Category.findOne({ $expr: {
+                        $eq: [
+                        { $toLower: { $trim: { input: "$name" } } },
+                        categoryName.toLowerCase().trim()
+                        ]
+                    } });
                     if (!categoryDoc) {
                         categoryDoc = await Category.create({ 
                             name: categoryName,
-                            description: "Imported from Excel"
+                            // description: "Imported from Excel"
                         });
                         console.log(`New category created: ${categoryName}`);
                     }
@@ -328,7 +338,12 @@ const uploadProductsFromExcel = asyncHandler(async (req, res) => {
                 const collectionNames = splitCollections(collections);
                 const collectionIds = [];
                 for (const collectionName of collectionNames) {
-                    let collectionDoc = await Collection.findOne({ name: collectionName });
+                    let collectionDoc = await Collection.findOne({ $expr: {
+                        $eq: [
+                          { $toLower: { $trim: { input: "$name" } } },
+                          collectionName.toLowerCase().trim()
+                        ]
+                      } });
                     if (!collectionDoc) {
                         collectionDoc = await Collection.create({ name: collectionName });
                         console.log(`New collection created: ${collectionName}`);
@@ -351,12 +366,13 @@ const uploadProductsFromExcel = asyncHandler(async (req, res) => {
                     shapeOfMultiDiamonds: shapeOfMultiDiamonds?.trim(),
                     goldColor: safeArray(goldColor),
                     gender: gender?.trim(),
-                    gemStoneWeightPointer: gemStoneWeightPointer?.trim(),
+                    gemStoneWeightPointer: safeNumber(gemStoneWeightPointer),
+                    gemStoneWeightSol: safeNumber(gemStoneWeightSol),
                     colouredStone: safeArray(colouredStone),
                     pointersWeight: safeNumber(pointersWeight),
                     addChain: safeBoolean(addChain),
                     isMrpProduct: safeBoolean(isMrpProduct),
-                    gemStoneWeight: safeNumber(gemStoneWeight),
+                    // gemStoneWeight: safeNumber(gemStoneWeight),
                     containsGemstone: safeBoolean(containsGemstone),
                     isPendantFixed: safeBoolean(isPendantFixed),
                     shapeOfSolitare: shapeOfSolitare?.trim(),
@@ -377,6 +393,14 @@ const uploadProductsFromExcel = asyncHandler(async (req, res) => {
                 );
 
                 // Update collections with product reference
+                for (const collectionId of collectionIds) {
+                    await Collection.findByIdAndUpdate(
+                        collectionId,
+                        { $addToSet: { products: product._id } },
+                        { new: true }
+                    );
+                }
+                
                 for (const collectionId of collectionIds) {
                     await Collection.findByIdAndUpdate(
                         collectionId,
@@ -479,24 +503,17 @@ const setBasePrice = asyncHandler(async (req, res) => {
         const allProducts = await Product.find({ containsGemstone: false });
 
         for (const element of allProducts) {
-            const diamondPrice = getDiamondPrice({ 
-                karat: 14, 
-                netWeight: element?.netWeight, 
-                solitareWeight: element?.solitareWeight, 
-                multiDiaWeight: element?.multiDiamondWeight 
-            }).subTotal;
+            const diamondPrice = getProductPriceDetails({ isGemStoneProduct: element?.containsGemstone, isChainAdded: false, chainKarat: 14, isColouredDiamond: false, karat: 14, pointersWeight: element?.pointersWeight, solitareWeight: element?.solitareWeight, gemStonePointerWeight: element?.gemStoneWeightPointer, gemStoneSolWeight: element?.gemStoneWeightSol, multiDiaWeight: element?.multiDiamondWeight, netWeight: element?.netWeight });
 
             console.log(element?.productId, element?.name);
-
             // Awaiting the update to ensure it completes
             await Product.findOneAndUpdate(
                 { _id: element?._id }, 
-                { $set: { price: diamondPrice } }, 
+                { $set: { price: diamondPrice?.subTotal } }, 
                 { new: true }
             );
 
 
-            console.log(element?.netWeight, element?.solitareWeight, element?.multiDiamondWeight);
         }
 
         return res.status(200).json(new ApiResponse(200, "Base price set successfully!"));    
@@ -517,13 +534,21 @@ const updatePendantField = asyncHandler(async (req, res) => {
         // const category = Category?.create({ name: "Pendants", description: "Pendants" });
 
         fixedPendant.forEach(async pendant => {
-            const updatedPendant = await Product?.findOne({ productId: pendant });
+            const updatedPendant = await Product.findOneAndUpdate(
+                { productId: pendant },
+                { $set: { isPendantFixed: true } },
+                { new: true }
+            );
             const updatedCategory = await Category?.findByIdAndUpdate("67fcc20d5e9ca5ca2a814609", { $push: { products: updatedPendant?._id }});
             console.log(updatedPendant);
         });
 
         notFixedPendant.forEach(async pendant => {
-            const updatedPendant = await Product?.findOne({ productId: pendant });
+            const updatedPendant = await Product.findOneAndUpdate(
+                { productId: pendant },
+                { $set: { isPendantFixed: false } },
+                { new: true }
+            );
             const updatedCategory = await Category?.findByIdAndUpdate("67fcc20d5e9ca5ca2a814609", { $push: { products: updatedPendant?._id }});
             console.log(updatedPendant);
         });
@@ -535,5 +560,23 @@ const updatePendantField = asyncHandler(async (req, res) => {
     }
 });
 
+const mapProductsToCategories = asyncHandler(async (req, res) => {
 
-export { addGemstoneField, updatePendantField, getAProduct, setBasePrice, mapImagesToProducts, getAllProducts, updateAProduct, deleteAProduct, deleteMultipleProducts, getAllProductsInACategory, createAProduct, uploadProductsFromExcel};
+    try {
+        
+        const products = await Product?.find()?.populate("category");
+
+        products?.forEach(async element => {
+            const category = await Category?.findByIdAndUpdate(element?.category?._id, { $addToSet: { products: new mongoose.Types.ObjectId(element?._id) } }, { new: true });
+            console.log(category);
+        });
+
+        return res.status(200).json(new ApiResponse(200, "Category updated successfully!"));    
+    } catch (error) { 
+        console.log(error);
+        return res.status(400).json({ error });
+    }
+});
+
+
+export { mapProductsToCategories, addGemstoneField, updatePendantField, getAProduct, setBasePrice, mapImagesToProducts, getAllProducts, updateAProduct, deleteAProduct, deleteMultipleProducts, getAllProductsInACategory, createAProduct, uploadProductsFromExcel};
