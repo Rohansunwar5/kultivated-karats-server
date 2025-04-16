@@ -37,7 +37,8 @@ const userSchema = new mongoose.Schema({
     phoneNumber: {
         type: Number,
         // unique: true,
-        sparse: true 
+        sparse: true,
+        required: false
     },
     phoneNumberVerified: {
         type: Boolean,
