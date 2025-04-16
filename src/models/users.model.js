@@ -37,9 +37,9 @@ const userSchema = new mongoose.Schema({
     phoneNumber: {
         type: Number,
         // required: true,
-        min: [10, "The phone number should be 10 digits"],
+        // min: [10, "The phone number should be 10 digits"],
         // default: 9876543210,
-        unique: true,
+        // unique: true,
     },
     phoneNumberVerified: {
         type: Boolean,
