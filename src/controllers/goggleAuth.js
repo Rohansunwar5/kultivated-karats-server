@@ -1,6 +1,7 @@
 import { OAuth2Client } from 'google-auth-library';
 import { User } from "../models/users.model.js";
 import { ApiError } from "../utils/ApiError.js";
+import bcrypt from "bcrypt";
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
