@@ -253,28 +253,48 @@ const googleLogin = asyncHandler(async (req, res) => {
 const googleSSO = asyncHandler(async (req, res) => {
     try {
         const { code } = req.body;
-        
+       
         if (!code) {
             throw new ApiError(400, "Authorization code is required");
         }
 
-        const { tokens } = await googleClient.getToken(code);
-        if (!tokens.id_token) {
-            throw new ApiError(400, "Invalid authorization code");
+        let tokens;
+        try {
+            const result = await googleClient.getToken(code);
+            tokens = result.tokens;
+        } catch (error) {
+            throw new ApiError(400, "Invalid authorization code or exchange failed");
         }
 
+        if (!tokens?.id_token) {
+            throw new ApiError(400, "No ID token received from Google");
+        }
+
+        // Verify and handle user
         const payload = await verifyGoogleToken(tokens.id_token);
         const { user, accessToken, refreshToken } = await handleGoogleUser(payload);
+
+        // Set secure cookies
+        const cookieOptions = {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        };
 
         return res.status(200)
             .cookie("accessToken", accessToken, cookieOptions)
             .cookie("refreshToken", refreshToken, cookieOptions)
             .json(new ApiResponse(200, {
-                user, accessToken, refreshToken
+                user,
+                accessToken,
+                refreshToken
             }, "Google login successful"));
     } catch (error) {
         console.error("Google SSO error:", error);
-        res.status(error?.statusCode || 500).json(error);
+        const statusCode = error.statusCode || 500;
+        const message = error.message || "Google SSO failed";
+        res.status(statusCode).json(new ApiError(statusCode, message));
     }
 });
 
