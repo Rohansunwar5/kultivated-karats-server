@@ -12,19 +12,24 @@ import { Collection } from "../models/collections.model.js";
 
 const getAllProducts = asyncHandler( async (req, res) => {
 
+    try {
+        const products = await Product.find().populate({
+            path: "category",
+            populate: {
+              path: "products",
+            }
+        });
+        
+        if ( !products ) 
+            throw new ApiError(500, "Internal server error!");
     
-    const products = await Product.find().populate({
-        path: "category",
-        populate: {
-          path: "products",
-        }
-    });
+        console.log(products[0]);
+        return res.status(200).json(new ApiResponse(200, products, "Products fetched successfully!"));    
+    } catch (error) {
+        console.log(error);        
+        return res.status(error.status || 500).json(error);
+    }
     
-    if ( !products ) 
-        throw new ApiError(500, "Internal server error!");
-
-    console.log(products[0]);
-    return res.status(200).json(new ApiResponse(200, products, "Products fetched successfully!"));
 });
 
 const getAProduct = asyncHandler( async (req, res) => {
