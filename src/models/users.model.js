@@ -142,7 +142,18 @@ const userSchema = new mongoose.Schema({
             phoneNo: Number,
             status: [ "Pending", "Concluded" ],
             email: String,
-            createdAt: String,
+            videoCallCart: [
+                {
+                    product: {
+                        type: Schema.Types.ObjectId,
+                        ref: "Product"
+                    },
+                    quantity: Number,
+                    color: String,
+                    karat: Number,
+                },
+            ], 
+            // createdAt: String,
         }
     ],
     creditPoints: {

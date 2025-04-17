@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import { handleGoogleUser, verifyGoogleToken } from "./goggleAuth.js";
 import twilio from "twilio";
+import { sendEmail } from "./emails.controller.js";
 
 /* Important : fix and update code for guest user */
 
@@ -349,6 +350,39 @@ const updateUserCart = asyncHandler( async (req, res) => {
     }
 });
 
+const bookAVideoCall = asyncHandler( async (req, res) => {
+    try {
+        const { videoCallCart, phoneNo } = req.body;
+
+        if ( !videoCallCart || videoCallCart?.length == 0 ) 
+            throw new ApiError(400, "Video call cart empty or not found in request body!");
+
+        if ( !req?.user )
+            throw new ApiError(400, "No user signed in!");
+
+        const videoCall = {
+            name: `${req?.user?.firstName} ${req?.user?.lastName}`,
+            phoneNo: phoneNo,
+            email: req?.user?.email,
+            videoCallCart: videoCallCart
+        };
+
+        const emailResponse = await sendEmail({ from: `${process.env.RESEND_TO_EMAIL}`, to: `${req?.user?.email}`, subject: `Your video call session has been booked at Kultivated Karats!`, html: ``})
+        const userEmailResponse = await sendEmail({ from: `${process.env.RESEND_TO_EMAIL}`, to: `${req?.user?.email}`, subject: `Video call enquiry from : ${req?.user?.email}, ${phoneNo}, ${req?.user?.firstName}, ${req?.user?.lastName}!`, html: ``})
+
+        const updatedUser = await User?.findByIdAndUpdate(req?.user?._id, { $set: { videoCallCart: [], videoCalls: videoCall }}, { new: true });
+
+        if ( !updatedUser )
+            throw new ApiError(400, "Failed to update user!");
+
+        return res.status(200).json(new ApiResponse(200, updatedUser, "videocall cart updated successfully!"))
+
+    } catch (error) {
+        console.log(error);
+        return res.status((error?.status || 500)).json(new ApiResponse((error?.status || 500), {}, "Account updation failed!"));   
+    }
+})
+
 const updateUserVideoCallCart = asyncHandler( async (req, res) => {
     try {
         const { updatedCart } = req.body;
@@ -482,4 +516,4 @@ const deleteMultipleCustomers = asyncHandler( async(req, res) => {
 //     const orders = user?.orders;
 // });
 
-export { getAllCustomers, registerUser, loginUser, logoutUser, refreshAccessToken, updateAccountDetails, getCurrentUser, updateUserCart, updateUserWishList, updateUserVideoCallCart, deleteACustomer, deleteMultipleCustomers, googleLogin , googleSSO, sendOtp };
+export { getAllCustomers, bookAVideoCall, registerUser, loginUser, logoutUser, refreshAccessToken, updateAccountDetails, getCurrentUser, updateUserCart, updateUserWishList, updateUserVideoCallCart, deleteACustomer, deleteMultipleCustomers, googleLogin , googleSSO, sendOtp };
