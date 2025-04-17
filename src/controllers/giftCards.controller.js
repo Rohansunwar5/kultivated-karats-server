@@ -1,4 +1,6 @@
+import mongoose from "mongoose";
 import { GiftCard } from "../models/giftCards.model.js";
+import { User } from "../models/users.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -40,15 +42,17 @@ const createAGiftCard = asyncHandler( async (req, res) => {
     
         const createdGiftCard = await GiftCard.create(giftCardData);
     
-        if ( !createdGiftCard )
-            throw new ApiError(500, "Failed to create coupon!");
-        
-        console.log(createdGiftCard);
+        const user = await User?.findByIdAndUpdate(req?.user?._id, { $push: { giftCards: new mongoose.Types.ObjectId(createdGiftCard?._id) } }, { new: true })?.select("-password -refreshToken").populate("wishList.product").populate("cart.product").populate("orders").populate("giftCards");
 
-        return res.status(200).json(new ApiResponse(200, createdGiftCard, "GiftCard created successfully!"));
+        if ( !createdGiftCard )
+            throw new ApiError(500, "Failed to create giftcard!");
+
+        console.log(createdGiftCard, user)
+
+        return res.status(200).json(new ApiResponse(200, { createdGiftCard, user }, "GiftCard created successfully!"));
     } catch (error) {
         console.log(error);
-        return res.status(error?.statusCode).json(error);
+        return res.status(error?.statsCode || 500).json(error);
     }
 });
 
