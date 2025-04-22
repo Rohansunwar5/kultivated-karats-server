@@ -88,6 +88,12 @@ const userSchema = new mongoose.Schema({
             color: String,
             karat: Number,
             totalPrice: Number,
+            containsGemstone: Boolean,
+            addChain: Boolean,
+            isGemStone: Boolean,
+            chainGoldCarat: Number,
+            totalPrice: Number,
+            ringSize: Number
         },
     ],
     orders: [

@@ -6,12 +6,12 @@ import { createACoupon, deleteACoupon, deleteMultipleCoupon, getAllCoupons, upda
 
 const router = Router();
 
-router.route("/verify-coupon").post(verifyCoupon);
+router.route("/verify-coupon").post(verifyJWT, verifyCoupon);
 
 /* Secured routed */
 
 router.route("/get-all-coupons").get(verifyJWT, getAllCoupons);
-router.route("/create-a-coupon").post(verifyJWT, createACoupon);
+router.route("/create-a-coupon").post(createACoupon);
 router.route("/update-a-coupon/:couponId").patch(verifyJWT, updateACoupon);
 router.route("/delete-a-coupon/:couponId").delete(verifyJWT, deleteACoupon);
 router.route("/delete-multiple-coupons").delete(verifyJWT, deleteMultipleCoupon);

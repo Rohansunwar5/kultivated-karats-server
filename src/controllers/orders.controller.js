@@ -4,6 +4,7 @@ import { User } from "../models/users.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { Coupon } from "../models/coupons.model.js";
 
 const getAllOrders = asyncHandler( async (req, res) => {
     try {
@@ -23,7 +24,7 @@ const getAllOrders = asyncHandler( async (req, res) => {
 
 const createAnOrder = asyncHandler( async (req, res) => {
     try {
-        const { order } = req.body;
+        const { order, couponCode } = req.body;
     
         // if ( !(req?.user?.role === "Admin") )
         //     throw new ApiError(400, "Unauthorized requrest!");
@@ -35,10 +36,17 @@ const createAnOrder = asyncHandler( async (req, res) => {
 
         if ( !newOrder )
             throw new ApiError(500, "Error while creating order!");
-        const user = await User.findByIdAndUpdate({ _id: req?.user?._id }, { $push: { orders: new mongoose.Types.ObjectId(newOrder?._id) } }, { new: true, runValidators: true }).populate("wishList.product").populate("videoCallCart.product").populate("cart.product").populate("orders").populate("orders.product").select("-password -refreshToken");
+        const user = await User.findByIdAndUpdate(req?.user?._id, { $push: { orders: new mongoose.Types.ObjectId(newOrder?._id) } }, { new: true, runValidators: true }).populate("wishList.product").populate("videoCallCart.product").populate("cart.product").populate("orders").populate("orders.product").select("-password -refreshToken");
         
         console.log(user);
         
+        if ( couponCode != "" ) {
+            const coupon = await Coupon?.findOneAndUpdate({ code: couponCode }, { $push: { usedBy: new mongoose.Types.ObjectId(req?.user?._id) } }, { new: true, runValidators: true }).populate("usedBy").populate("category");
+    
+            if ( !coupon )
+                throw new ApiError(404, "Order created but coupon not found or updated", [ "Error while validating coupon!" ]);
+        }
+
         return res.status(200).json(new ApiResponse(200, user, "order created successfully!"));    
     } catch (error) {
         let errorMessage;
