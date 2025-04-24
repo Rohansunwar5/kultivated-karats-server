@@ -8,7 +8,7 @@ dotenv.config({
 });
 
 connectDB().then(() => {
-    app.listen(process.env.PORT || 8000, () => {
+    app.listen(process.env.PORT || 8000, '0.0.0.0', () => { // read about '0.0.0.0'
         console.log("🖥  Server running at PORT: "+process.env.PORT+", URL: http://localhost:8000/");
         console.log(mongoose.models);
     });
