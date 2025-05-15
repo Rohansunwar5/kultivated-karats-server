@@ -5,12 +5,14 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 const verifyCoupon = asyncHandler( async (req, res) => {
     try {
+
         const { code, cart } = req.body;
+        
         if ( !code )
             throw new ApiError(404, "No coupon code found!");
 
         if ( !req?.user ) {
-            throw new ApiError(400, "User not found", [ "Log in to use copuons!" ]);
+            throw new ApiError(400, "User not found", [ "Log in to use coupons!" ]);
         }
 
         if ( !cart || cart?.length == 0 ) {
@@ -36,7 +38,8 @@ const verifyCoupon = asyncHandler( async (req, res) => {
             let ringCount = 0;
             if ( cart?.length > 1 ) 
                 for ( let i = 0; i < cart?.length; i++ ) {
-                    ringCount += cart[i]?.product?.category?.toLowerCase() == "67fe5da50254f62d3e5fe917" ? cart[i]?.quantity : 0; 
+                    ringCount += cart[i]?.product?.category?.name?.toLowerCase
+                    () == "67fe5da50254f62d3e5fe917" ? cart[i]?.quantity : 0; 
                     console.log("cart: ",cart[i]?.quantity, cart[i]?.product?.category, "cartValid: ", ringCount);
                 }
             if ( !(ringCount >= 2) )

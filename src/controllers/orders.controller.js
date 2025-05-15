@@ -5,6 +5,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Coupon } from "../models/coupons.model.js";
+import { sendEmail } from "./emails.controller.js";
 
 const getAllOrders = asyncHandler( async (req, res) => {
     try {
@@ -38,15 +39,14 @@ const createAnOrder = asyncHandler( async (req, res) => {
             throw new ApiError(500, "Error while creating order!");
         const user = await User.findByIdAndUpdate(req?.user?._id, { $push: { orders: new mongoose.Types.ObjectId(newOrder?._id) } }, { new: true, runValidators: true }).populate("wishList.product").populate("videoCallCart.product").populate("cart.product").populate("orders").populate("orders.product").select("-password -refreshToken");
         
-        console.log(user);
+        console.log(couponCode);
         
-        if ( couponCode != "" ) {
+        if ( couponCode != "" && couponCode != null && couponCode != undefined ) {
             const coupon = await Coupon?.findOneAndUpdate({ code: couponCode }, { $push: { usedBy: new mongoose.Types.ObjectId(req?.user?._id) } }, { new: true, runValidators: true }).populate("usedBy").populate("category");
     
             if ( !coupon )
                 throw new ApiError(404, "Order created but coupon not found or updated", [ "Error while validating coupon!" ]);
-        }
-
+        } 
         return res.status(200).json(new ApiResponse(200, user, "order created successfully!"));    
     } catch (error) {
         let errorMessage;

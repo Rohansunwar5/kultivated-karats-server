@@ -32,6 +32,63 @@ const getAllProducts = asyncHandler( async (req, res) => {
     
 });
 
+const getProducts = asyncHandler( async (req, res) => {
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 39;
+
+    const skip = (page - 1) * limit;
+
+    const filters = req?.body?.filters;
+
+    const query = {};
+
+    if (filters.gender.male || filters.gender.female) {
+        const genders = [];
+        if (filters.gender.male) genders.push("Male");
+        if (filters.gender.female) genders.push("Female");
+
+        query.gender = { $in: genders };
+    }
+    
+    query.price = {
+        $gte: filters.price.min,
+        $lte: filters.price.max,
+    };
+
+    if (filters.categories.length > 0)
+        query.category = { $in: filters.categories };
+
+    if (filters.collections.length > 0)
+        query.collections = { $in: filters.collections.map(id => new mongoose.Types.ObjectId(id)) };
+ 
+    console.log(filters, query);
+
+    try {
+        const total = await Product.countDocuments(query);
+        const products = await Product.find(query).skip(skip).limit(limit).populate({
+            path: "category",
+            populate: {
+              path: "products",
+            }
+        });
+        
+        if ( !products ) 
+            throw new ApiError(500, "Internal server error!");
+    
+        console.log(products);
+        return res.status(200).json(new ApiResponse(200, { data: products, meta: {
+            total,
+            page,
+            totalPages: Math.ceil(total / limit)
+        } }, "Products fetched successfully!"));    
+    } catch (error) {
+        console.log(error);        
+        return res.status(error.status || 500).json(error);
+    }
+    
+});
+
 const getAProduct = asyncHandler( async (req, res) => {
     try {
         const { id } = req.params;
@@ -584,4 +641,4 @@ const mapProductsToCategories = asyncHandler(async (req, res) => {
 });
 
 
-export { mapProductsToCategories, addGemstoneField, updatePendantField, getAProduct, setBasePrice, mapImagesToProducts, getAllProducts, updateAProduct, deleteAProduct, deleteMultipleProducts, getAllProductsInACategory, createAProduct, uploadProductsFromExcel};
+export { getProducts, mapProductsToCategories, addGemstoneField, updatePendantField, getAProduct, setBasePrice, mapImagesToProducts, getAllProducts, updateAProduct, deleteAProduct, deleteMultipleProducts, getAllProductsInACategory, createAProduct, uploadProductsFromExcel};

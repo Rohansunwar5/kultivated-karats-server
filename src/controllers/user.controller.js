@@ -367,8 +367,8 @@ const bookAVideoCall = asyncHandler( async (req, res) => {
             videoCallCart: videoCallCart
         };
 
-        const emailResponse = await sendEmail({ from: `${process.env.RESEND_TO_EMAIL}`, to: `${req?.user?.email}`, subject: `Your video call session has been booked at Kultivated Karats!`, html: ``})
-        const userEmailResponse = await sendEmail({ from: `${process.env.RESEND_TO_EMAIL}`, to: `${req?.user?.email}`, subject: `Video call enquiry from : ${req?.user?.email}, ${phoneNo}, ${req?.user?.firstName}, ${req?.user?.lastName}!`, html: ``})
+        const emailResponse = await sendEmail({ from: `${process.env.RESEND_FROM_EMAIL}`, to: `${req?.user?.email}`, subject: `Your video call session has been booked at Kultivated Karats!`, html: ``})
+        const userEmailResponse = await sendEmail({ from: `${process.env.RESEND_FROM_EMAIL}`, to: `${req?.user?.email}`, subject: `Video call enquiry from : ${req?.user?.email}, ${phoneNo}, ${req?.user?.firstName}, ${req?.user?.lastName}!`, html: ``})
 
         const updatedUser = await User?.findByIdAndUpdate(req?.user?._id, { $set: { videoCallCart: [], videoCalls: videoCall }}, { new: true });
 

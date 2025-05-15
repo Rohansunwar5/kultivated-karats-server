@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import { addGemstoneField, createAProduct, deleteAProduct, deleteMultipleProducts, getAProduct, getAllProducts, getAllProductsInACategory, mapImagesToProducts, mapProductsToCategories, setBasePrice, updateAProduct, updatePendantField, uploadProductsFromExcel } from "../controllers/product.controller.js";
+import { addGemstoneField, createAProduct, deleteAProduct, deleteMultipleProducts, getAProduct, getAllProducts, getAllProductsInACategory, getProducts, mapImagesToProducts, mapProductsToCategories, setBasePrice, updateAProduct, updatePendantField, uploadProductsFromExcel } from "../controllers/product.controller.js";
 import { uploadXLSX } from "../middlewares/multer.middleware.js";
 
 const router = Router();
@@ -19,11 +19,12 @@ router.route("/update-pendants").patch(updatePendantField);
 
 /* Secured routes */
 
+router.route("/get-products").post(getProducts);
 router.route("/add-product").post(verifyJWT, createAProduct);
 router.route("/edit-product/:id").patch(verifyJWT, updateAProduct);
 router.route("/delete-a-product/:id").delete(verifyJWT, deleteAProduct);
 router.route("/delete-multiple-products").delete(verifyJWT, deleteMultipleProducts);
-router.route("/map-images-to-products").patch(mapImagesToProducts);
-router.route("/map-products-to-categories").patch(mapProductsToCategories);
+router.route("/map-images-to-products").patch(verifyJWT, mapImagesToProducts);
+router.route("/map-products-to-categories").patch(verifyJWT, mapProductsToCategories);
 
 export default router;
