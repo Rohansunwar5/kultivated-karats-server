@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getAllCustomers, getCurrentUser, loginUser, logoutUser, refreshAccessToken, registerUser, updateAccountDetails, updateUserCart, updateUserWishList, deleteACustomer, deleteMultipleCustomers, updateUserVideoCallCart, googleLogin, googleSSO, sendOtp } from "../controllers/user.controller.js";
+import { getAllCustomers, getCurrentUser, loginUser, logoutUser, refreshAccessToken, registerUser, updateAccountDetails, updateUserCart, updateUserWishList, deleteACustomer, deleteMultipleCustomers, updateUserVideoCallCart, googleLogin, googleSSO, sendOtp, updateUserPhone } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { verifyOtp } from "../middlewares/otp.middleware.js";
 
@@ -16,6 +16,7 @@ router.route("/get-all-customers").get(getAllCustomers);
 router.route("/current-user").get(verifyJWT, getCurrentUser);
 router.route("/logout").post(verifyJWT, logoutUser);
 router.route("/generate-tokens").post(refreshAccessToken);
+router.route("/update-user-phone").patch(verifyJWT, updateUserPhone);
 router.route("/update-user-cart").patch(verifyJWT, updateUserCart);
 router.route("/update-user-video-call-cart").patch(verifyJWT, updateUserVideoCallCart);
 router.route("/update-user-details").patch(verifyJWT, updateAccountDetails);

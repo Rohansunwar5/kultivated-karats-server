@@ -14,7 +14,8 @@ const productSchema = new mongoose.Schema({
     category: {
         type: Schema.Types.ObjectId,
         // required: true,
-        ref: "Category"
+        ref: "Category",
+        index: true
     },
     subCategories: [
         {
@@ -27,8 +28,9 @@ const productSchema = new mongoose.Schema({
         {
             type: Schema.Types.ObjectId,
             // required: true,
-            ref: "Collections"
-        }
+            ref: "Collection",
+            index: true
+        },
     ],
     goldWeight: {
         type: Number,
@@ -100,6 +102,7 @@ const productSchema = new mongoose.Schema({
     price: {
         type: Number,
         // required: true,
+        index: true
     },
     quantitySold: {
         type: Number,
@@ -122,7 +125,8 @@ const productSchema = new mongoose.Schema({
     },    
     containsGemstone: {
         type: Boolean,
-        // required: true
+        // required: true,
+        default: false
     },
     gemStoneWeightSol: {
         type: Number,

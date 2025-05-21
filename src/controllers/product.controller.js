@@ -13,12 +13,7 @@ import { Collection } from "../models/collections.model.js";
 const getAllProducts = asyncHandler( async (req, res) => {
 
     try {
-        const products = await Product.find().populate({
-            path: "category",
-            populate: {
-              path: "products",
-            }
-        });
+        const products = await Product.find();;
         
         if ( !products ) 
             throw new ApiError(500, "Internal server error!");
@@ -32,61 +27,149 @@ const getAllProducts = asyncHandler( async (req, res) => {
     
 });
 
-const getProducts = asyncHandler( async (req, res) => {
+// const getProducts = asyncHandler( async (req, res) => {
 
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 39;
+//     const page = parseInt(req.query.page) || 1;
+//     const limit = parseInt(req.query.limit) || 39;
 
+//     const skip = (page - 1) * limit;
+
+//     const filters = req?.body?.filters;
+
+//     const query = {};
+
+//     if (filters.gender.male || filters.gender.female) {
+//         const genders = [];
+//         if (filters.gender.male) genders.push("Male");
+//         if (filters.gender.female) genders.push("Female");
+
+//         query.gender = { $in: genders };
+//     }
+//     if ( filters.min && filters.max)
+//         query.price = {
+//             $gte: filters.price.min,
+//             $lte: filters.price.max,
+//         };
+
+//     if (filters.categories.length > 0)
+//         query.category = { $in: filters.categories };
+
+//     if (filters.collections.length > 0)
+//         query.collections = { $in: filters.collections.map(id => new mongoose.Types.ObjectId(id)) };
+ 
+//     console.log(filters, query);
+
+//     try {
+//         const total = await Product.countDocuments(query);
+//         const products = await Product.find(query).skip(skip).limit(limit).populate({
+//             path: "category",
+//             populate: {
+//               path: "products",
+//             }
+//         });
+        
+//         if ( !products ) 
+//             throw new ApiError(500, "Internal server error!");
+    
+//         console.log(products);
+//         return res.status(200).json(new ApiResponse(200, { data: products, meta: {
+//             total,
+//             page,
+//             totalPages: Math.ceil(total / limit)
+//         } }, "Products fetched successfully!"));    
+//     } catch (error) {
+//         console.log(error);        
+//         return res.status(error.status || 500).json(error);
+//     }
+    
+// });
+
+const getProducts = asyncHandler(async (req, res) => {
+    // Pagination
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(39, parseInt(req.query.limit) || 15); // Reduce default limit
     const skip = (page - 1) * limit;
 
-    const filters = req?.body?.filters;
+    // Initialize filters with defaults
+    const filters = req.body?.filters || {};
+    filters.gender = filters.gender || {};
+    filters.price = filters.price || {};
+    filters.categories = filters.categories || [];
+    filters.collections = filters.collections || [];
 
+    // Build query
     const query = {};
 
+    // Gender filter
     if (filters.gender.male || filters.gender.female) {
         const genders = [];
         if (filters.gender.male) genders.push("Male");
         if (filters.gender.female) genders.push("Female");
-
         query.gender = { $in: genders };
     }
-    
-    query.price = {
-        $gte: filters.price.min,
-        $lte: filters.price.max,
-    };
 
-    if (filters.categories.length > 0)
+    // gemstone issue due to price filter
+
+    const minPrice = filters.price.min !== undefined ? Number(filters.price.min) : 0;
+    const maxPrice = filters.price.max !== undefined ? Number(filters.price.max) : Infinity;
+
+    if (!isNaN(minPrice) && !isNaN(maxPrice)) {
+        query.price = {
+            $gte: minPrice,
+            $lte: maxPrice
+        };
+    }
+
+    // Category filter
+    if (filters.categories.length > 0) {
         query.category = { $in: filters.categories };
+    }
 
-    if (filters.collections.length > 0)
-        query.collections = { $in: filters.collections.map(id => new mongoose.Types.ObjectId(id)) };
- 
-    console.log(filters, query);
+    // Collection filter    
+    if (filters.collections.length > 0) {
+        const validCollectionIds = filters.collections.filter(id =>
+            mongoose.Types.ObjectId.isValid(id)
+        );
+        if (validCollectionIds.length > 0) {
+            query.collections = {
+                $in: validCollectionIds.map(id => new mongoose.Types.ObjectId(id))
+            };
+        }
+    }
+
+    console.log(filters);
+    console.log(query);
 
     try {
+        // Count total matching documents first
         const total = await Product.countDocuments(query);
-        const products = await Product.find(query).skip(skip).limit(limit).populate({
-            path: "category",
-            populate: {
-              path: "products",
-            }
-        });
-        
-        if ( !products ) 
-            throw new ApiError(500, "Internal server error!");
-    
-        console.log(products);
-        return res.status(200).json(new ApiResponse(200, { data: products, meta: {
-            total,
-            page,
-            totalPages: Math.ceil(total / limit)
-        } }, "Products fetched successfully!"));    
+
+        // Get paginated results (with simplified populate)
+        const products = await Product.find(query)
+            .skip(skip)
+            .limit(limit)
+            .populate("category")
+            .populate("collections")
+            .lean();
+
+        if (!products) {
+            throw new ApiError(500, "Failed to fetch products");
+        }
+
+        return res.status(200).json(
+            new ApiResponse(200, {
+                data: products,
+                meta: {
+                    total,
+                    page,
+                    limit,
+                    totalPages: Math.ceil(total / limit)
+                }
+            }, "Products fetched successfully")
+        );
     } catch (error) {
-        console.log(error);        
-        return res.status(error.status || 500).json(error);
+        throw new ApiError(error.statusCode || 500, error.message || "Product fetch failed");
     }
-    
 });
 
 const getAProduct = asyncHandler( async (req, res) => {

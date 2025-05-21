@@ -312,7 +312,7 @@ const updateAccountDetails = asyncHandler( async(req, res) => {
         // let currentUser;
     
         // if ( updateType == "self")
-        const currentUser = await User.findByIdAndUpdate(req.user?._id, {...user}, { new: true }).select("-password -refreshToken").populate("wishList.product").populate("cart.product").populate("orders");
+        const currentUser = await User.findByIdAndUpdate(req.user?._id, {...user}, { new: true }).populate("wishList.product").populate("videoCallCart.product").populate("videoCalls.videoCallCart.product").populate("cart.product").populate("orders").populate("orders.product").select("-password -refreshToken");
     
         // else if ( updateType == "other")
             // currentUser = await User.findByIdAndUpdate(user?._id, {...user}, { new: true }).select("-password -refreshToken").pupulate("wishList.product").populate("cart.product").populate("orders");
@@ -516,4 +516,25 @@ const deleteMultipleCustomers = asyncHandler( async(req, res) => {
 //     const orders = user?.orders;
 // });
 
-export { getAllCustomers, bookAVideoCall, registerUser, loginUser, logoutUser, refreshAccessToken, updateAccountDetails, getCurrentUser, updateUserCart, updateUserWishList, updateUserVideoCallCart, deleteACustomer, deleteMultipleCustomers, googleLogin , googleSSO, sendOtp };
+const updateUserPhone = asyncHandler( async (req, res) => {
+    try {
+        const { phoneNumber } = req.body;
+    
+        if ( !phoneNumber || !req?.user?._id )
+            throw new ApiError(400, "You are not logged in!");
+    
+        const updatedUser = await User.findByIdAndUpdate(req?.user?._id, { $set : { phoneNumber: Number(phoneNumber) } }, { new: true }).populate("wishList.product").populate("videoCallCart.product").populate("cart.product").populate("orders").populate("orders.product").select("-password -refreshToken");
+        console.log(phoneNumber, updatedUser);
+
+        if ( !updatedUser )
+            throw new ApiError(500, "Something went wrong!");
+    
+        return res.status(200).json(new ApiResponse(200, updatedUser, "Phone number updated successfully!"))
+    
+    } catch (error) {
+        console.log(error);        
+        return res.status((error?.status || 500)).json(new ApiResponse((error?.status || 500), {}, "Phone number updation failed!"));   
+    }
+});
+
+export { getAllCustomers, updateUserPhone, bookAVideoCall, registerUser, loginUser, logoutUser, refreshAccessToken, updateAccountDetails, getCurrentUser, updateUserCart, updateUserWishList, updateUserVideoCallCart, deleteACustomer, deleteMultipleCustomers, googleLogin , googleSSO, sendOtp };

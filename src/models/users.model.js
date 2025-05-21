@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema({
     phoneNumber: {
         type: Number,
         // unique: true,
-        sparse: true,
+        // sparse: true,
         required: false
     },
     phoneNumberVerified: {
@@ -146,7 +146,10 @@ const userSchema = new mongoose.Schema({
         {
             name: String,
             phoneNo: Number,
-            status: [ "Pending", "Concluded" ],
+            status: {
+                type: String,
+                enum: [ "Pending", "Concluded" ],
+            },
             email: String,
             videoCallCart: [
                 {
