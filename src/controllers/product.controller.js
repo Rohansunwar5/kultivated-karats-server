@@ -173,8 +173,8 @@ const getProducts = asyncHandler(async (req, res) => {
         const products = await Product.find(query)
             .skip(skip)
             .limit(limit)
-            .populate("category")
-            .populate("collections")
+            // .populate("category")
+            // .populate("collections")
             .lean();
 
         if (!products) {
