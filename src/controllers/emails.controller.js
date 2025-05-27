@@ -1,7 +1,10 @@
 import { Resend } from "resend";
+import dotenv from "dotenv";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+
+dotenv.config({ path: "./.env" });
 
 const resend = new Resend(process.env.RESEND_API);
 

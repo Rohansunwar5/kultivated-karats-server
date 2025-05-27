@@ -10,6 +10,31 @@ import { SubCategory } from "../models/subCategories.model.js";
 import mongoose from "mongoose";
 import { Collection } from "../models/collections.model.js";
 
+export const searchProducts = asyncHandler(async (req, res) => {
+    const query = req.query.query?.toString().trim();
+
+    try {
+        
+        if (!query) {
+            return res.status(400).json(new ApiResponse(400, [], "Search query is required"));
+        }
+    
+        const products = await Product.find({
+            name: { $regex: query, $options: "i" }
+        })
+        .limit(20)
+        .lean();
+    
+        return res.status(200).json(
+            new ApiResponse(200, products, "Search results")
+        );
+        
+    } catch (error) {
+        console.log(error);        
+        return res.status(error.status || 500).json(error);
+    }
+});
+
 const getAllProducts = asyncHandler( async (req, res) => {
 
     try {
