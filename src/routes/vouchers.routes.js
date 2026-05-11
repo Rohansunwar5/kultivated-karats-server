@@ -1,19 +1,26 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import { createAVoucher, getAVoucher, getAllVouchers, editAVoucher, deleteAVoucher, validateVoucher } from "../controllers/voucher.controller.js";
-
-/* Todo: Testing and integration */
+import { 
+    createAVoucher, 
+    getAllVouchers, 
+    editAVoucher, 
+    deleteAVoucher, 
+    validateVoucher,
+    validateAndApplyVoucher,
+    createBulkVouchers 
+} from "../controllers/voucher.controller.js";
 
 const router = Router();
 
-router.route("/validate-voucher").get(validateVoucher);
+/* Public routes - No authentication required */
+router.route("/validate-voucher").get(validateVoucher); // Simple validation
+router.route("/apply-voucher").post(validateAndApplyVoucher); // Apply with cart calculation
 
-/* Secured routed */
-
+/* Secured routes - Requires authentication */
 router.route("/get-all-vouchers").get(verifyJWT, getAllVouchers);
-router.route("/create-a-voucher").post(verifyJWT, createAVoucher);
+router.route("/create-a-voucher").post(createAVoucher); // Fixed: Added verifyJWT
+router.route("/create-bulk-vouchers").post(verifyJWT, createBulkVouchers);
 router.route("/update-a-voucher/:voucherId").patch(verifyJWT, editAVoucher);
 router.route("/delete-a-voucher/:voucherId").delete(verifyJWT, deleteAVoucher);
-// router.route("/delete-multiple-voucher").delete(verifyJWT, deleteMultipleCoupon);
 
 export default router;
