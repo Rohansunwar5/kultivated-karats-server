@@ -332,11 +332,25 @@ const updateAccountDetails = asyncHandler( async(req, res) => {
 const updateUserCart = asyncHandler( async (req, res) => {
     try {
         const { updatedCart } = req.body;
-    
+
         if ( !updatedCart || !req?.user?._id )
             throw new ApiError(400, "user._id or updatedCart not received!");
-    
-        const updatedUser = await User.findOneAndUpdate({ _id: req?.user?._id }, { $set : { cart: updatedCart } }, { new: true }).select("-password -refreshToken").populate("wishList.product").populate("cart.product").populate("videoCallCart.product").populate("orders.product");
+
+        // Normalise each cart item's product before saving:
+        //  - Real products (whose _id is a valid Mongo ObjectId) are stored as
+        //    just the ObjectId, so they keep working exactly as before and stay
+        //    populatable via .populate("cart.product").
+        //  - Gold coins are synthetic (ids like "1"/"2"/"5", not ObjectIds) and
+        //    are kept as the full embedded object since they aren't DB documents.
+        const normalisedCart = (Array.isArray(updatedCart) ? updatedCart : []).map((item) => {
+            const product = item?.product;
+            const productId = product?._id ?? product;
+            if ( mongoose.isValidObjectId(productId) )
+                return { ...item, product: productId };
+            return item; // gold coin (or anything without a valid ObjectId) — keep as-is
+        });
+
+        const updatedUser = await User.findOneAndUpdate({ _id: req?.user?._id }, { $set : { cart: normalisedCart } }, { new: true }).select("-password -refreshToken").populate("wishList.product").populate("cart.product").populate("videoCallCart.product").populate("orders.product");
         console.log(updatedUser);
 
         if ( !updatedUser )

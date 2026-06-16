@@ -32,7 +32,19 @@ const createAnOrder = asyncHandler( async (req, res) => {
     
         if ( !order )
             throw new ApiError(400, "No order object recieved!");
-    
+
+        // Normalise cart products before saving: real products (valid ObjectId)
+        // are stored as just their ObjectId so .populate("cart.product") works;
+        // gold coins (non-ObjectId ids) are kept as the full embedded object.
+        if ( Array.isArray(order?.cart) ) {
+            order.cart = order.cart.map((item) => {
+                const productId = item?.product?._id ?? item?.product;
+                if ( mongoose.isValidObjectId(productId) )
+                    return { ...item, product: productId };
+                return item;
+            });
+        }
+
         const newOrder = await Order.create(order);
 
         if ( !newOrder )

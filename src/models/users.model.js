@@ -80,8 +80,14 @@ const userSchema = new mongoose.Schema({
     },
     cart: [
         {
+            // Mixed instead of a strict ObjectId ref so the cart can hold both
+            // real Product references (stored as an ObjectId) AND synthetic
+            // gold-coin items (which are not DB documents and have non-ObjectId
+            // ids like "1", "2", "5"). The controller normalises real products
+            // down to their ObjectId before saving, so .populate("cart.product")
+            // still works for them and skips gold-coin objects untouched.
             product: {
-                type: Schema.Types.ObjectId,
+                type: Schema.Types.Mixed,
                 ref: "Product"
             },
             quantity: Number,
