@@ -6,6 +6,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Coupon } from "../models/coupons.model.js";
 import { sendEmail } from "./emails.controller.js";
+import { normaliseCart } from "../utils/normaliseCart.js";
 
 const getAllOrders = asyncHandler( async (req, res) => {
     try {
@@ -33,17 +34,10 @@ const createAnOrder = asyncHandler( async (req, res) => {
         if ( !order )
             throw new ApiError(400, "No order object recieved!");
 
-        // Normalise cart products before saving: real products (valid ObjectId)
-        // are stored as just their ObjectId so .populate("cart.product") works;
-        // gold coins (non-ObjectId ids) are kept as the full embedded object.
-        if ( Array.isArray(order?.cart) ) {
-            order.cart = order.cart.map((item) => {
-                const productId = item?.product?._id ?? item?.product;
-                if ( mongoose.isValidObjectId(productId) )
-                    return { ...item, product: productId };
-                return item;
-            });
-        }
+        // Route real products -> `product` (ObjectId) and gold coins -> `goldCoin`
+        // so populate never chokes on the synthetic coin objects. See normaliseCart.
+        if ( order && Array.isArray(order.cart) )
+            order.cart = normaliseCart(order.cart);
 
         const newOrder = await Order.create(order);
 

@@ -30,13 +30,17 @@ const orderSchema = new mongoose.Schema({
     },
     cart: [
         {
-            // Mixed (not a strict ObjectId ref) so an order can contain both real
-            // Product references AND synthetic gold-coin items (non-ObjectId ids
-            // like "1"/"2"/"5"). Real products are normalised to their ObjectId
-            // before saving so .populate("cart.product") still works for them.
+            // Real products: stored as an ObjectId ref, resolved via populate.
+            // Gold coins: NOT DB documents (ids "1"/"2"/"5"), so they go in the
+            // separate Mixed `goldCoin` field — keeping them out of `product`
+            // prevents populate from $in-casting them and throwing. The toJSON
+            // transform re-exposes goldCoin as product on the way out.
             product: {
-                type: Schema.Types.Mixed,
+                type: Schema.Types.ObjectId,
                 ref: "Product"
+            },
+            goldCoin: {
+                type: Schema.Types.Mixed,
             },
             quantity: Number,
             color: String,
@@ -48,5 +52,20 @@ const orderSchema = new mongoose.Schema({
         type: String,
     }
 }, { timestamps: true });
+
+// Expose gold-coin cart items under `product` when serialized to JSON, so
+// clients read cart.product.* uniformly. Runs after casting, so it can't throw.
+orderSchema.set("toJSON", {
+    transform: function (_doc, ret) {
+        if ( Array.isArray(ret.cart) ) {
+            ret.cart = ret.cart.map((item) => {
+                if ( item && item.goldCoin && !item.product )
+                    return { ...item, product: item.goldCoin };
+                return item;
+            });
+        }
+        return ret;
+    }
+});
 
 export const Order = mongoose.model("Order", orderSchema);

@@ -80,15 +80,20 @@ const userSchema = new mongoose.Schema({
     },
     cart: [
         {
-            // Mixed instead of a strict ObjectId ref so the cart can hold both
-            // real Product references (stored as an ObjectId) AND synthetic
-            // gold-coin items (which are not DB documents and have non-ObjectId
-            // ids like "1", "2", "5"). The controller normalises real products
-            // down to their ObjectId before saving, so .populate("cart.product")
-            // still works for them and skips gold-coin objects untouched.
+            // Real products are stored here as an ObjectId ref and resolved via
+            // .populate("cart.product"). Gold coins are NOT DB documents (their
+            // ids are "1"/"2"/"5", not ObjectIds), so they must never live in
+            // this field — populate would try to $in-cast them and throw. They
+            // go in `goldCoin` below instead. A post-init hook on the schema
+            // copies goldCoin -> product after load so the frontend can keep
+            // reading cartItem.product.* uniformly for both.
             product: {
-                type: Schema.Types.Mixed,
+                type: Schema.Types.ObjectId,
                 ref: "Product"
+            },
+            // Synthetic gold-coin payload (full object, not a DB ref).
+            goldCoin: {
+                type: Schema.Types.Mixed,
             },
             quantity: Number,
             color: String,
@@ -229,6 +234,24 @@ userSchema.methods.generateRefreshToken = function () {
 // userSchema.path("role").validate(function(value) {
 //     return ["Admin", "Guest", "Customer"].includes(value);
 // }, "Invalid role value");
-  
+
+// When a user is serialized to JSON (i.e. sent to the frontend), expose gold-coin
+// cart items under `product` too, so the client keeps reading cartItem.product.*
+// uniformly for both products and coins. This runs at serialization time — after
+// all schema casting — so surfacing the coin object here never triggers an
+// ObjectId cast. (Gold coins are stored in `goldCoin` because they are not
+// populatable DB refs; see the cart schema above.)
+userSchema.set("toJSON", {
+    transform: function (_doc, ret) {
+        if ( Array.isArray(ret.cart) ) {
+            ret.cart = ret.cart.map((item) => {
+                if ( item && item.goldCoin && !item.product )
+                    return { ...item, product: item.goldCoin };
+                return item;
+            });
+        }
+        return ret;
+    }
+});
 
 export const User = mongoose.model("User", userSchema);
