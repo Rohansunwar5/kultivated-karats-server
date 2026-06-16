@@ -749,4 +749,17 @@ const mapProductsToCategories = asyncHandler(async (req, res) => {
 });
 
 
-export { getProducts, mapProductsToCategories, addGemstoneField, updatePendantField, getAProduct, setBasePrice, mapImagesToProducts, getAllProducts, updateAProduct, deleteAProduct, deleteMultipleProducts, getAllProductsInACategory, createAProduct, uploadProductsFromExcel};
+const addNineKaratToAllProducts = asyncHandler(async (req, res) => {
+    try {
+        const result = await Product.updateMany(
+            { totalKarats: { $ne: 9 } },
+            { $addToSet: { totalKarats: 9 } }
+        );
+        return res.status(200).json(new ApiResponse(200, { modifiedCount: result.modifiedCount }, `Added 9k to ${result.modifiedCount} products`));
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+});
+
+export { getProducts, mapProductsToCategories, addGemstoneField, updatePendantField, getAProduct, setBasePrice, mapImagesToProducts, getAllProducts, updateAProduct, deleteAProduct, deleteMultipleProducts, getAllProductsInACategory, createAProduct, uploadProductsFromExcel, addNineKaratToAllProducts};
