@@ -15,8 +15,7 @@ const getAllOrders = asyncHandler( async (req, res) => {
         if ( !orders ) 
             throw new ApiError(500, "Internal server error!");
 
-        console.log(products[0]);
-        return res.status(200).json(new ApiResponse(200, products, "Orders fetched successfully!"));
+        return res.status(200).json(new ApiResponse(200, orders, "Orders fetched successfully!"));
     } catch (error) {
         return res.status(error.status || 500).json(error);
     }

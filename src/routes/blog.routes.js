@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { verifyAdminJWT } from "../middlewares/admin.middleware.js";
 import { createABlog, deleteABlog, editABlog, getABlog, getAllBlogs } from "../controllers/blogs.controller.js";
 
 const router = Router();
@@ -11,8 +12,8 @@ router.route("/get-a-blog/:blogId").get(getABlog);
 
 /* Secured routes */
 
-router.route("/create-a-blog").post(verifyJWT, createABlog);
-router.route("/update-a-blog/:blogId").patch(verifyJWT, editABlog);
-router.route("/delete-a-blog/:blogId").delete(verifyJWT, deleteABlog);
+router.route("/create-a-blog").post(verifyAdminJWT, createABlog);
+router.route("/update-a-blog/:blogId").patch(verifyAdminJWT, editABlog);
+router.route("/delete-a-blog/:blogId").delete(verifyAdminJWT, deleteABlog);
 
 export default router;

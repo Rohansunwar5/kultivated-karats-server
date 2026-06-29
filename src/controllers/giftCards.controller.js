@@ -17,11 +17,8 @@ const getAllGiftCards = asyncHandler( async (req, res) => {
     try {
         const coupons = await GiftCard.find();
     
-        if ( !(req?.user?.role === "Admin") )
-            throw new ApiError(400, "Unauthorized requrest!");
-    
         if ( !coupons )
-            throw new ApiError(404, "No coupons found!");
+            throw new ApiError(404, "No gift cards found!");
     
         return res.status(200).json(new ApiResponse(200, coupons, "GiftCards fetched successfully!"));
     } catch (error) {
@@ -61,9 +58,6 @@ const updateAGiftCard = asyncHandler( async (req, res) => {
         const { giftCardId } = req.params;
         const { updatedGiftCardFromReq } = req.body;
     
-        if ( !(req?.user?.role == "Admin") )
-            throw new ApiError(400, "Unauthorized request!");
-    
         if ( !giftCardId || !updatedGiftCardFromReq ) 
             throw new ApiError(400, "GiftCard Id or coupon data not found!");
     
@@ -83,13 +77,10 @@ const deleteAGiftCard = asyncHandler( async (req, res) => {
     try {
         const { giftCardId } = req.params;
     
-        if ( !(req?.user?.role == "Admin") )
-            throw new ApiError(400, "Unauthorized requrest!");
-    
         if  ( !giftCardId ) 
             throw new ApiError(400, "GiftCard ID not found!");
     
-        const deleteResponse = await GiftCard.deleteOne({ _id: couponId });
+        const deleteResponse = await GiftCard.deleteOne({ _id: giftCardId });
     
         if ( !deleteResponse )
             throw new ApiError(500, "Failed to delete coupon!");
@@ -104,9 +95,6 @@ const deleteAGiftCard = asyncHandler( async (req, res) => {
 const deleteMultipleGiftCard = asyncHandler(async (req, res) => {
     try {
         const { ids } = req.body;
-    
-        if ( !(req?.user?.role == "Admin") )
-            throw new ApiError(400, "Unauthorized request!");
     
         if ( !ids || !(ids instanceof Array) )
             throw new ApiError(400, "GiftCard ids either not present or not an array!");

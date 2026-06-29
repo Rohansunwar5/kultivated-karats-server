@@ -1,0 +1,501 @@
+[
+  {
+    "_id": "67fe5e6a18a0ffb695357bc8",
+    "productId": "Copy of 41",
+    "__v": 0,
+    "category": "67fe5e1d0254f62d3e5fee7d",
+    "collections": [
+      "67fe5db10254f62d3e5fe9a6"
+    ],
+    "createdAt": "2025-04-15T13:26:01.542Z",
+    "description": "",
+    "diamondWeight": 0.55,
+    "gemStoneColour": [],
+    "gemStoneWeightPointer": 0.55,
+    "gemStoneWeightSol": 0,
+    "gender": "female",
+    "imageUrl": [
+      {
+        "url": "http://res.cloudinary.com/dthrjonaq/image/upload/v1744262323/daadis.in/a8lk8ghxmeripwj1zm1v.webp",
+        "publicId": "daadis.in/a8lk8ghxmeripwj1zm1v",
+        "_id": "67ff8a262917e266465c9a36"
+      },
+      {
+        "url": "http://res.cloudinary.com/dthrjonaq/image/upload/v1744262355/daadis.in/dsjq6gywoyrolepnmxn8.webp",
+        "publicId": "daadis.in/dsjq6gywoyrolepnmxn8",
+        "_id": "67ff8a262917e266465c9a37"
+      }
+    ],
+    "isMrpProduct": false,
+    "multiDiamondWeight": 0.12,
+    "name": "Crystal Glow Lab Diamond Earrings",
+    "netWeight": 1.73,
+    "pointersWeight": 0,
+    "quantitySold": 0,
+    "shapeOfSolitare": "round",
+    "stock": 0,
+    "subCategories": [],
+    "totalKarats": [
+      9
+    ],
+    "updatedAt": "2026-05-11T10:15:10.384Z",
+    "containsGemstone": true,
+    "price": 14754.36
+  },
+  {
+    "_id": "67fe5e6a18a0ffb695357bc9",
+    "productId": "Copy of 47",
+    "__v": 0,
+    "category": "67fe5e1d0254f62d3e5fee7d",
+    "collections": [
+      "67fe5db10254f62d3e5fe9a6"
+    ],
+    "createdAt": "2025-04-15T13:26:01.991Z",
+    "description": "",
+    "diamondWeight": 0.75,
+    "gemStoneColour": [],
+    "gemStoneWeightPointer": 0.75,
+    "gemStoneWeightSol": 0,
+    "gender": "female",
+    "imageUrl": [
+      {
+        "url": "http://res.cloudinary.com/dthrjonaq/image/upload/v1744262345/daadis.in/axstrm3qlilgnyihcxcs.webp",
+        "publicId": "daadis.in/axstrm3qlilgnyihcxcs",
+        "_id": "67ff8a262917e266465c9a66"
+      }
+    ],
+    "isMrpProduct": false,
+    "multiDiamondWeight": 0.04,
+    "name": "Celestial Harmony Lab Diamond Earrings",
+    "netWeight": 3.06,
+    "pointersWeight": 0,
+    "quantitySold": 0,
+    "shapeOfSolitare": "round",
+    "stock": 0,
+    "subCategories": [],
+    "totalKarats": [
+      9
+    ],
+    "updatedAt": "2026-05-11T10:15:10.384Z",
+    "containsGemstone": true,
+    "price": 20776.92
+  },
+  {
+    "_id": "67fe5e6a18a0ffb695357bca",
+    "productId": "Copy of 52",
+    "__v": 0,
+    "category": "67fe5e1d0254f62d3e5fee7d",
+    "collections": [
+      "67fe5db10254f62d3e5fe9a6"
+    ],
+    "createdAt": "2025-04-15T13:26:02.383Z",
+    "description": "",
+    "diamondWeight": 1.65,
+    "gemStoneColour": [],
+    "gemStoneWeightPointer": 1.65,
+    "gemStoneWeightSol": 0,
+    "gender": "female",
+    "imageUrl": [
+      {
+        "url": "http://res.cloudinary.com/dthrjonaq/image/upload/v1744262349/daadis.in/zc31np6oudy1tiunx7y2.webp",
+        "publicId": "daadis.in/zc31np6oudy1tiunx7y2",
+        "_id": "67ff8a262917e266465c9a6e"
+      }
+    ],
+    "isMrpProduct": false,
+    "multiDiamondWeight": 0,
+    "name": "Timeless Grace Lab Diamond Earrings",
+    "netWeight": 3.17,
+    "pointersWeight": 0,
+    "quantitySold": 0,
+    "shapeOfSolitare": "mix",
+    "stock": 0,
+    "subCategories": [],
+    "totalKarats": [
+      9
+    ],
+    "updatedAt": "2026-05-11T10:15:10.384Z",
+    "containsGemstone": true,
+    "price": 20707.239999999998
+  },
+  {
+    "_id": "67fe5e6b18a0ffb695357bcb",
+    "productId": "Copy of 53",
+    "__v": 0,
+    "category": "67fe5e1d0254f62d3e5fee7d",
+    "collections": [
+      "67fe5db10254f62d3e5fe9a6"
+    ],
+    "createdAt": "2025-04-15T13:26:02.802Z",
+    "description": "",
+    "diamondWeight": 1.25,
+    "gemStoneColour": [],
+    "gemStoneWeightPointer": 1.25,
+    "gemStoneWeightSol": 0,
+    "gender": "female",
+    "imageUrl": [
+      {
+        "url": "http://res.cloudinary.com/dthrjonaq/image/upload/v1744262350/daadis.in/ba8j6lyflv0zjhc6re1j.webp",
+        "publicId": "daadis.in/ba8j6lyflv0zjhc6re1j",
+        "_id": "67ff8a262917e266465c9a70"
+      }
+    ],
+    "isMrpProduct": false,
+    "multiDiamondWeight": 0.85,
+    "name": "Radiant Orbit Lab Diamond Earrings",
+    "netWeight": 4.32,
+    "pointersWeight": 0,
+    "quantitySold": 0,
+    "shapeOfSolitare": "mix",
+    "stock": 0,
+    "subCategories": [],
+    "totalKarats": [
+      9
+    ],
+    "updatedAt": "2026-05-11T10:15:10.384Z",
+    "containsGemstone": true,
+    "price": 53424.04
+  },
+  {
+    "_id": "67fe5e6b18a0ffb695357bcc",
+    "productId": "Copy of 78",
+    "__v": 0,
+    "category": "67fe5e1d0254f62d3e5fee7d",
+    "collections": [
+      "67fe5db10254f62d3e5fe9a6"
+    ],
+    "createdAt": "2025-04-15T13:26:03.223Z",
+    "description": "",
+    "diamondWeight": 0.08,
+    "gemStoneColour": [],
+    "gemStoneWeightPointer": 0.08,
+    "gemStoneWeightSol": 0,
+    "gender": "female",
+    "imageUrl": [
+      {
+        "url": "http://res.cloudinary.com/dthrjonaq/image/upload/v1744262375/daadis.in/fondumfrxcqhtu1d0tn7.webp",
+        "publicId": "daadis.in/fondumfrxcqhtu1d0tn7",
+        "_id": "67ff8a262917e266465c9aa0"
+      }
+    ],
+    "isMrpProduct": false,
+    "multiDiamondWeight": 0,
+    "name": "Infinity Shine Lab Diamond Earrings",
+    "netWeight": 1.57,
+    "pointersWeight": 0,
+    "quantitySold": 0,
+    "shapeOfSolitare": "round",
+    "stock": 0,
+    "subCategories": [],
+    "totalKarats": [
+      9
+    ],
+    "updatedAt": "2026-05-11T10:15:10.384Z",
+    "containsGemstone": true,
+    "price": 9887.04
+  },
+  {
+    "_id": "67fe5e6c18a0ffb695357bcd",
+    "productId": "Copy of 79",
+    "__v": 0,
+    "category": "67fe5e1d0254f62d3e5fee7d",
+    "collections": [
+      "67fe5db10254f62d3e5fe9a6"
+    ],
+    "createdAt": "2025-04-15T13:26:03.662Z",
+    "description": "",
+    "diamondWeight": 1,
+    "gemStoneColour": [],
+    "gemStoneWeightPointer": 1,
+    "gemStoneWeightSol": 0,
+    "gender": "female",
+    "imageUrl": [
+      {
+        "url": "http://res.cloudinary.com/dthrjonaq/image/upload/v1744262387/daadis.in/geufmybluk6k1lnngtut.webp",
+        "publicId": "daadis.in/geufmybluk6k1lnngtut",
+        "_id": "67ff8a262917e266465c9ab8"
+      }
+    ],
+    "isMrpProduct": false,
+    "multiDiamondWeight": 0.12,
+    "name": "Lunar Mirage Lab Diamond Earrings",
+    "netWeight": 2.04,
+    "pointersWeight": 0,
+    "quantitySold": 0,
+    "shapeOfSolitare": "round",
+    "stock": 0,
+    "subCategories": [],
+    "totalKarats": [
+      9
+    ],
+    "updatedAt": "2026-05-11T10:15:10.384Z",
+    "containsGemstone": true,
+    "price": 16923.68
+  },
+  {
+    "_id": "67fe5e6c18a0ffb695357bce",
+    "productId": "Copy of 82",
+    "__v": 0,
+    "category": "67fe5e1d0254f62d3e5fee7d",
+    "collections": [
+      "67fe5db10254f62d3e5fe9a6"
+    ],
+    "createdAt": "2025-04-15T13:26:04.102Z",
+    "description": "",
+    "diamondWeight": 0.5,
+    "gemStoneColour": [],
+    "gemStoneWeightPointer": 0.5,
+    "gemStoneWeightSol": 0,
+    "gender": "female",
+    "imageUrl": [
+      {
+        "url": "http://res.cloudinary.com/dthrjonaq/image/upload/v1744262376/daadis.in/sbx6pthsijbtjfzqrbmm.webp",
+        "publicId": "daadis.in/sbx6pthsijbtjfzqrbmm",
+        "_id": "67ff8a262917e266465c9aa2"
+      }
+    ],
+    "isMrpProduct": false,
+    "multiDiamondWeight": 0.84,
+    "name": "Ethereal Bliss Lab Diamond Earrings",
+    "netWeight": 5.87,
+    "pointersWeight": 0,
+    "quantitySold": 0,
+    "shapeOfSolitare": "round",
+    "stock": 0,
+    "subCategories": [],
+    "totalKarats": [
+      9
+    ],
+    "updatedAt": "2026-05-11T10:15:10.384Z",
+    "containsGemstone": true,
+    "price": 62468.24
+  },
+  {
+    "_id": "67fe5e6d18a0ffb695357bcf",
+    "productId": "Copy of 98",
+    "__v": 0,
+    "category": "67fe5e1d0254f62d3e5fee7d",
+    "collections": [
+      "67fe5db10254f62d3e5fe9a6"
+    ],
+    "createdAt": "2025-04-15T13:26:04.582Z",
+    "description": "",
+    "diamondWeight": 1,
+    "gemStoneColour": [],
+    "gemStoneWeightPointer": 1,
+    "gemStoneWeightSol": 0,
+    "gender": "female",
+    "imageUrl": [
+      {
+        "url": "http://res.cloudinary.com/dthrjonaq/image/upload/v1744262383/daadis.in/vygropxugsqd6cgyxnt5.webp",
+        "publicId": "daadis.in/vygropxugsqd6cgyxnt5",
+        "_id": "67ff8a262917e266465c9ab0"
+      }
+    ],
+    "isMrpProduct": false,
+    "multiDiamondWeight": 0.63,
+    "name": "Royal Gleam Lab Diamond Earrings",
+    "netWeight": 5.19,
+    "pointersWeight": 0,
+    "quantitySold": 0,
+    "shapeOfSolitare": "mix",
+    "stock": 0,
+    "subCategories": [],
+    "totalKarats": [
+      9
+    ],
+    "updatedAt": "2026-05-11T10:15:10.384Z",
+    "containsGemstone": true,
+    "price": 52102.880000000005
+  },
+  {
+    "_id": "67fe5e6d18a0ffb695357bd0",
+    "productId": "Copy of 99",
+    "__v": 0,
+    "category": "67fe5e1d0254f62d3e5fee7d",
+    "collections": [
+      "67fe5db10254f62d3e5fe9a6"
+    ],
+    "createdAt": "2025-04-15T13:26:05.042Z",
+    "description": "",
+    "diamondWeight": 0,
+    "gemStoneColour": [],
+    "gemStoneWeightPointer": 0,
+    "gemStoneWeightSol": 0,
+    "gender": "female",
+    "imageUrl": [
+      {
+        "url": "http://res.cloudinary.com/dthrjonaq/image/upload/v1744262398/daadis.in/vosammnckii0txuwusxl.webp",
+        "publicId": "daadis.in/vosammnckii0txuwusxl",
+        "_id": "67ff8a262917e266465c9ad0"
+      }
+    ],
+    "isMrpProduct": false,
+    "multiDiamondWeight": 1.39,
+    "name": "Dazzling Horizon Lab Diamond Earrings",
+    "netWeight": 3.53,
+    "pointersWeight": 0,
+    "quantitySold": 0,
+    "shapeOfSolitare": "mix",
+    "stock": 0,
+    "subCategories": [],
+    "totalKarats": [
+      9
+    ],
+    "updatedAt": "2026-05-11T10:15:10.384Z",
+    "containsGemstone": true,
+    "price": 64173.76
+  },
+  {
+    "_id": "67fe5e6e18a0ffb695357bd1",
+    "productId": "Copy of 101",
+    "__v": 0,
+    "category": "67fe5e1d0254f62d3e5fee7d",
+    "collections": [
+      "67fe5db10254f62d3e5fe9a6"
+    ],
+    "createdAt": "2025-04-15T13:26:05.451Z",
+    "description": "",
+    "diamondWeight": 0.2,
+    "gemStoneColour": [],
+    "gemStoneWeightPointer": 0.2,
+    "gemStoneWeightSol": 0,
+    "gender": "female",
+    "imageUrl": [
+      {
+        "url": "http://res.cloudinary.com/dthrjonaq/image/upload/v1744262385/daadis.in/bdy6heyrbjvfbwnqs4qb.webp",
+        "publicId": "daadis.in/bdy6heyrbjvfbwnqs4qb",
+        "_id": "67ff8a262917e266465c9ab4"
+      }
+    ],
+    "isMrpProduct": false,
+    "multiDiamondWeight": 1.04,
+    "name": "Twilight Breeze Lab Diamond Earrings",
+    "netWeight": 2.57,
+    "pointersWeight": 0,
+    "quantitySold": 0,
+    "shapeOfSolitare": "pear",
+    "stock": 0,
+    "subCategories": [],
+    "totalKarats": [
+      9
+    ],
+    "updatedAt": "2026-05-11T10:15:10.384Z",
+    "containsGemstone": true,
+    "price": 47668.64
+  },
+  {
+    "_id": "67fe5e6e18a0ffb695357bd2",
+    "productId": "Copy of 102",
+    "__v": 0,
+    "category": "67fe5e1d0254f62d3e5fee7d",
+    "collections": [
+      "67fe5db10254f62d3e5fe9a6"
+    ],
+    "createdAt": "2025-04-15T13:26:05.902Z",
+    "description": "",
+    "diamondWeight": 1.6,
+    "gemStoneColour": [],
+    "gemStoneWeightPointer": 1.6,
+    "gemStoneWeightSol": 0,
+    "gender": "female",
+    "imageUrl": [
+      {
+        "url": "http://res.cloudinary.com/dthrjonaq/image/upload/v1744262399/daadis.in/m3gorwunonjwwsxn5m0e.webp",
+        "publicId": "daadis.in/m3gorwunonjwwsxn5m0e",
+        "_id": "67ff8a262917e266465c9ad2"
+      }
+    ],
+    "isMrpProduct": false,
+    "multiDiamondWeight": 0.93,
+    "name": "Stellar Shine Lab Diamond Earrings",
+    "netWeight": 6.66,
+    "pointersWeight": 0,
+    "quantitySold": 0,
+    "shapeOfSolitare": "mix",
+    "stock": 0,
+    "subCategories": [],
+    "totalKarats": [
+      9
+    ],
+    "updatedAt": "2026-05-11T10:15:10.384Z",
+    "containsGemstone": true,
+    "price": 70694.72
+  },
+  {
+    "_id": "67fe5e6e18a0ffb695357bd3",
+    "productId": "Copy of 105",
+    "__v": 0,
+    "category": "67fe5e1d0254f62d3e5fee7d",
+    "collections": [
+      "67fe5db10254f62d3e5fe9a6"
+    ],
+    "createdAt": "2025-04-15T13:26:06.322Z",
+    "description": "",
+    "diamondWeight": 1,
+    "gemStoneColour": [],
+    "gemStoneWeightPointer": 1,
+    "gemStoneWeightSol": 0,
+    "gender": "female",
+    "imageUrl": [
+      {
+        "url": "http://res.cloudinary.com/dthrjonaq/image/upload/v1744262400/daadis.in/sv1vdmm2u83ekq6kreui.webp",
+        "publicId": "daadis.in/sv1vdmm2u83ekq6kreui",
+        "_id": "67ff8a262917e266465c9ad6"
+      }
+    ],
+    "isMrpProduct": false,
+    "multiDiamondWeight": 1.67,
+    "name": "Shimmer Glow Lab Diamond Earrings",
+    "netWeight": 7.21,
+    "pointersWeight": 0,
+    "quantitySold": 0,
+    "shapeOfSolitare": "mix",
+    "stock": 0,
+    "subCategories": [],
+    "totalKarats": [
+      9
+    ],
+    "updatedAt": "2026-05-11T10:15:10.384Z",
+    "containsGemstone": true,
+    "price": 96221.92
+  },
+  {
+    "_id": "67fe5e6f18a0ffb695357bd4",
+    "productId": "Copy of 125",
+    "__v": 0,
+    "category": "67fe5e1d0254f62d3e5fee7d",
+    "collections": [
+      "67fe5db10254f62d3e5fe9a6"
+    ],
+    "createdAt": "2025-04-15T13:26:06.793Z",
+    "description": "",
+    "diamondWeight": 0.6,
+    "gemStoneColour": [],
+    "gemStoneWeightPointer": 0.6,
+    "gemStoneWeightSol": 0,
+    "gender": "female",
+    "imageUrl": [
+      {
+        "url": "http://res.cloudinary.com/dthrjonaq/image/upload/v1744262414/daadis.in/tc3grwwf37mk6pkai9lh.webp",
+        "publicId": "daadis.in/tc3grwwf37mk6pkai9lh",
+        "_id": "67ff8a262917e266465c9af4"
+      }
+    ],
+    "isMrpProduct": false,
+    "multiDiamondWeight": 0.41,
+    "name": "Whispering Starlight Lab Diamond Earrings",
+    "netWeight": 3.49,
+    "pointersWeight": 0,
+    "quantitySold": 0,
+    "shapeOfSolitare": "mix",
+    "stock": 0,
+    "subCategories": [],
+    "totalKarats": [
+      9
+    ],
+    "updatedAt": "2026-05-11T10:15:10.384Z",
+    "containsGemstone": true,
+    "price": 34587.68
+  }
+]

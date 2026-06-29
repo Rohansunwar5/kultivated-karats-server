@@ -14,14 +14,11 @@ const getAllCollections = asyncHandler( async ( _, res) => {
 
 const createACollection = asyncHandler( async (req, res) => {
     try {
-        const { collection } = req.body;
+        const collection = req.body;
     
         /* Todo: handle banner images */
     
-        if ( !(req?.user?.role === "Admin") )
-            throw new ApiError(400, "Unauthorized requrest!");
-    
-        if ( !collection )
+        if ( !collection || Object.keys(collection).length === 0 )
             throw new ApiError(404, "Collection data not found!");
     
         const createdCollection = await Collection.create(collection);
@@ -39,17 +36,12 @@ const createACollection = asyncHandler( async (req, res) => {
 const updateACollection = asyncHandler( async (req, res) => {
     try {
         const { categoryId } = req.params;
-        const { updatedCategoryFromReq } = req.body;
+        const updates = req.body;
     
-        if ( !(req?.user?.role === "Admin") )
-            throw new ApiError(400, "Unauthorized requrest!");
+        if ( !categoryId || !updates || Object.keys(updates).length === 0 )
+            throw new ApiError(400, "Collection id or updated data not present!");
     
-        if ( !categoryId || !updatedCategoryFromReq )
-            throw new ApiError(400, "Collection id or updated category not present!");
-    
-        console.log(categoryId, updatedCategoryFromReq);        
-
-        let updatedCategory = await Collection.findByIdAndUpdate(categoryId, updatedCategoryFromReq).populate("products");
+        let updatedCategory = await Collection.findByIdAndUpdate(categoryId, updates).populate("products");
 
         if ( !updatedCategory )
             throw new ApiError(500, "Error while updating category!");
@@ -70,9 +62,6 @@ const updateACollection = asyncHandler( async (req, res) => {
 
 const deleteACollection = asyncHandler( async (req, res ) => {
     const { categoryId } = req.params;
-
-    if ( !(req?.user?.role === "Admin") )
-        throw new ApiError(400, "Unauthorized requrest!");
 
     if ( !categoryId )
         throw new ApiResponse(400, "Collection id not found in the request!")

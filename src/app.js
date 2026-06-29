@@ -20,6 +20,8 @@ import voucherRouter from "./routes/vouchers.routes.js"
 import paymentRouter from "./routes/payment.routes.js";
 import emailRouter from "./routes/email.routes.js";
 import otpRouter from "./routes/otp.routes.js";
+import adminRouter from "./routes/admin.routes.js";
+import goldCoinRouter from "./routes/goldCoin.routes.js";
 
 const app = express();
 
@@ -65,5 +67,7 @@ app.use("/api/v1/vouchers", voucherRouter);
 app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/email", emailRouter);
 app.use("/api/v1/otp", otpRouter);
+app.use("/api/v1/admin", adminRouter);
+app.use("/api/v1/gold-coins", goldCoinRouter);
 
 export { app };

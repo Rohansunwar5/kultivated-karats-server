@@ -149,9 +149,6 @@ const getAllCoupons = asyncHandler( async (req, res) => {
     try {
         const coupons = await Coupon.find().populate("category").populate("usedBy");
     
-        if ( !(req?.user?.role === "Admin") )
-            throw new ApiError(400, "Unauthorized requrest!");
-    
         if ( !coupons )
             throw new ApiError(404, "No coupons found!");
     
@@ -191,9 +188,6 @@ const updateACoupon = asyncHandler( async (req, res) => {
         const { couponId } = req.params;
         const { updatedCouponFromReq } = req.body;
     
-        if ( !(req?.user?.role == "Admin") )
-            throw new ApiError(400, "Unauthorized request!");
-    
         if ( !couponId || !updatedCouponFromReq ) 
             throw new ApiError(400, "Coupon Id or coupon data not found!");
     
@@ -213,9 +207,6 @@ const deleteACoupon = asyncHandler( async (req, res) => {
     try {
         const { couponId } = req.params;
     
-        if ( !(req?.user?.role == "Admin") )
-            throw new ApiError(400, "Unauthorized requrest!");
-    
         if  ( !couponId ) 
             throw new ApiError(400, "Coupon ID not found!");
     
@@ -234,9 +225,6 @@ const deleteACoupon = asyncHandler( async (req, res) => {
 const deleteMultipleCoupon = asyncHandler(async (req, res) => {
     try {
         const { ids } = req.body;
-    
-        if ( !(req?.user?.role == "Admin") )
-            throw new ApiError(400, "Unauthorized request!");
     
         if ( !ids || !(ids instanceof Array) )
             throw new ApiError(400, "Coupon ids either not present or not an array!");

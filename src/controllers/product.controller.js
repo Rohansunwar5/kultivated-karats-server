@@ -239,18 +239,15 @@ const getAllProductsInACategory = asyncHandler( async (req, res) => {
 const updateAProduct = asyncHandler( async(req, res) => {
     try{
         const { id } = req.params;
-        const { updatedProductFromReq } = req.body;
-
-        if ( !(req?.user?.role === "Admin") )
-            throw new ApiError(400, "Unauthorized requrest!");
+        const updates = req.body;
 
         if ( !id )
             throw new ApiError(400, "No id found!");
 
-        if ( !updatedProductFromReq )
+        if ( !updates || Object.keys(updates).length === 0 )
             throw new ApiError(400, "No updated product found!");
 
-        const updatedProduct = await Product.findByIdAndUpdate(id, updatedProductFromReq, {runValidators: true, new: true}).populate("productCategory");
+        const updatedProduct = await Product.findByIdAndUpdate(id, updates, {runValidators: true, new: true}).populate("productCategory");
 
         console.log(updatedProduct);
 
@@ -279,9 +276,6 @@ const deleteAProduct = asyncHandler( async(req, res) => {
     try {
         const { id } = req.params;
     
-        if ( !(req?.user?.role === "Admin") )
-            throw new ApiError(400, "Unauthorized requrest!");
-
         if ( !id )
             throw new ApiError(400, "No id found!");
 
@@ -300,9 +294,6 @@ const deleteAProduct = asyncHandler( async(req, res) => {
 const deleteMultipleProducts = asyncHandler( async(req, res) => {
     try {
         const { ids } = req.body;
-    
-        if ( !(req?.user?.role === "Admin") )
-            throw new ApiError(400, "Unauthorized requrest!");
     
         if ( !ids ) 
             throw new ApiError(404, "No ids found!");
@@ -327,12 +318,9 @@ const deleteMultipleProducts = asyncHandler( async(req, res) => {
 
 const createAProduct = asyncHandler( async (req, res) => {
     try {
-        const { product } = req.body;
+        const product = req.body;
     
-        // if ( !(req?.user?.role === "Admin") )
-        //     throw new ApiError(400, "Unauthorized requrest!");
-    
-        if ( !product )
+        if ( !product || Object.keys(product).length === 0 )
             throw new ApiError(400, "No product object recieved!");
     
         const newProduct = await Product.create(product);

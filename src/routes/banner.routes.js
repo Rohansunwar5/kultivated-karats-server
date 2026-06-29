@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { verifyAdminJWT } from "../middlewares/admin.middleware.js";
 import { createABanner, getAllBanners, getABannerById, getAllBannersOfAType, updateABanner, deleteABanner } from "../controllers/banners.controller.js";
 
 /* Todo: handle images */
@@ -14,8 +15,8 @@ router.route("/get-a-banner-by-id/:bannerId").get(getABannerById);
 
 /* Secured routes */
 
-router.route("/create-a-banner").post(verifyJWT, createABanner);
-router.route("/update-a-banner/:bannerId").patch(verifyJWT, updateABanner);
-router.route("/delete-a-banner/:bannerId").delete(verifyJWT, deleteABanner);
+router.route("/create-a-banner").post(verifyAdminJWT, createABanner);
+router.route("/update-a-banner/:bannerId").patch(verifyAdminJWT, updateABanner);
+router.route("/delete-a-banner/:bannerId").delete(verifyAdminJWT, deleteABanner);
 
 export default router;

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { verifyAdminJWT } from "../middlewares/admin.middleware.js";
 import { addGemstoneField, addNineKaratToAllProducts, createAProduct, deleteAProduct, deleteMultipleProducts, getAProduct, getAllProducts, getAllProductsInACategory, getProducts, mapImagesToProducts, mapProductsToCategories, searchProducts, setBasePrice, updateAProduct, updatePendantField, uploadProductsFromExcel } from "../controllers/product.controller.js";
 import { uploadXLSX } from "../middlewares/multer.middleware.js";
 
@@ -22,11 +23,11 @@ router.route("/update-pendants").patch(updatePendantField);
 /* Secured routes */
 
 router.route("/get-products").post(getProducts);
-router.route("/add-product").post(verifyJWT, createAProduct);
-router.route("/edit-product/:id").patch(verifyJWT, updateAProduct);
-router.route("/delete-a-product/:id").delete(verifyJWT, deleteAProduct);
-router.route("/delete-multiple-products").delete(verifyJWT, deleteMultipleProducts);
-router.route("/map-images-to-products").patch(verifyJWT, mapImagesToProducts);
-router.route("/map-products-to-categories").patch(verifyJWT, mapProductsToCategories);
+router.route("/add-product").post(verifyAdminJWT, createAProduct);
+router.route("/edit-product/:id").patch(verifyAdminJWT, updateAProduct);
+router.route("/delete-a-product/:id").delete(verifyAdminJWT, deleteAProduct);
+router.route("/delete-multiple-products").delete(verifyAdminJWT, deleteMultipleProducts);
+router.route("/map-images-to-products").patch(verifyAdminJWT, mapImagesToProducts);
+router.route("/map-products-to-categories").patch(verifyAdminJWT, mapProductsToCategories);
 
 export default router;
